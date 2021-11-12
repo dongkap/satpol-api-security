@@ -1,0 +1,106 @@
+dongkap:
+  signature:
+    private-key: UHU3NG42QjNuNHI=
+    public-key: dc20c81f-1441-4f83-af98-454053772409
+    aes:
+      secret-key: UHVsYW5nQjNuNHI=
+    param-key: X-DONGKAP-Key
+    param-timestamp: X-DONGKAP-Timestamp
+    param-signature: X-DONGKAP-Signature
+  locale: en-US
+
+spring:
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:P@ssw0rd}
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:satpol}
+    username: ${DATABASE_USERNAME:dongkap}
+    password: ${DATABASE_PASSWORD:P@ssw0rd}
+    platform: postgres
+    type: com.mchange.v2.c3p0.ComboPooledDataSource
+    tomcat:
+      validation-query: SELECT 1
+      initial-size: 10
+      max-active: 100
+      max-idle: 20
+      max-wait: 3000
+      test-while-idle: true
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+#    database-platform: org.hibernate.spatial.dialect.postgis.PostgisDialect
+    database: POSTGRESQL
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        current_session_context_class: org.springframework.orm.hibernate5.SpringSessionContext
+        temp:
+          use_jdbc_metadata_defaults: false
+        show_sql: true
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+        implicit-strategy: org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyJpaImpl
+
+security:
+  oauth2:
+    resource:
+      filter-order: 3
+      jwt:
+        key-value: CfZKBe7IZHxBCgH9Dz49
+      prefer-token-info: true
+
+async-thread-pool:
+  corePoolSize: 20
+  maximumPoolSize: 1000
+  keepAliveTime: 30
+  queueCapacity: 200
+  threadPrefix: DONGKAP_EXEC-
+
+ribbon:
+  eureka:
+    enabled: false
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 15000
+        readTimeout: 15000
+        errorDecoder: com.dongkap.feign.decoder.FeignErrorDecoder
+hystrix:
+  shareSecurityContext: true
+  command:
+    default:
+      circuitBreaker:
+        enabled: true
+        forceOpen: false
+        forceClosed: false
+        requestVolumeThreshold: 20
+        sleepWindowInMilliseconds: 5000
+        errorThresholdPercentage: 50
+      requestCache:
+        enabled: true
+      execution:
+        timeout:
+          enabled: true
+        isolation:
+          strategy: THREAD
+          thread:
+            timeoutInMilliseconds: 15000
+            interruptOnTimeout: true
+            interruptOnFutureCancel: false
+          semaphore:
+            maxConcurrentRequests: 10
+      fallback:
+        enabled: true
+        isolation:
+          semaphore:
+            maxConcurrentRequests: 10
+
+satpol-master:
+  ribbon:
+    listOfServers: satpol-master:8085

@@ -1,0 +1,101 @@
+server:
+  port: 8081
+  servlet:
+    context-path: /api/security
+
+spring:
+  application:
+    name: satpol-security
+  messages:
+    basename: i18n/messages
+    cache-seconds: -1
+    encoding: UTF-8
+  aop:
+    proxy-target-class: true
+  mvc:
+    locale: en_US
+  cloud:
+    discovery:
+      enabled: false
+    config:
+      enabled: false
+      discovery:
+        enabled: false
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-name: Google
+            clientId: ${GOOGLE_OAUTH_CLIENT_ID}
+            clientSecret: ${GOOGLE_OAUTH_CLIENT_SECRET}
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
+          github:
+            client-name: Github
+            clientId: ${GITHUB_OAUTH_CLIENT_ID}
+            clientSecret: ${GITHUB_OAUTH_CLIENT_SECRET}
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - user:email
+              - read:user
+          facebook:
+            client-name: Facebook
+            clientId: ${FACEBOOK_OAUTH_CLIENT_ID}
+            clientSecret: ${FACEBOOK_OAUTH_CLIENT_SECRET}
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - public_profile
+        provider:
+          facebook:
+            authorizationUri: https://www.facebook.com/v3.0/dialog/oauth
+            tokenUri: https://graph.facebook.com/v3.0/oauth/access_token
+            userInfoUri: https://graph.facebook.com/v3.0/me?fields=id,first_name,middle_name,last_name,name,email,verified,is_verified,picture.width(250).height(250)
+feign:
+  compression:
+    request:
+      enabled: false
+    response:
+      enabled: true
+  hystrix:
+    enabled: true
+  client:
+    config:
+      default:
+        loggerLevel: full
+retryer:
+  disable: false
+  backoff: 5000
+  maxAttempts: 3
+
+logging:
+  level:
+    root: INFO
+    com.netflix: INFO
+    com.netflix.loadbalancer.reactive.LoadBalancerCommand: DEBUG
+    org.springframework.web: INFO
+    org.springframework.cloud: INFO
+    org.hibernate.SQL: INFO
+    org.hibernate.type: INFO
+    org.apache.http: INFO
+    org.apache.tomcat: INFO
+    com.mchange.v2.async.ThreadPoolAsynchronousRunner: INFO
+    com.github.isrsal.logging.LoggingFilter: INFO
+
+dongkap:
+  client-id:
+    web: satpol-core
+  app-code:
+    default: SMART
+  oauth2:
+    # After successfully authenticating with the OAuth2 Provider,
+    # we'll be generating an auth token for the user and sending the token to the
+    # redirectUri mentioned by the client in the /oauth2/authorize request.
+    # We're not using cookies because they won't work well in mobile clients.
+    authorizedRedirectUris:
+      - ${DONGKAP_REDIRECT_URI}
+  login:
+    single-session: ${SINGLE_SESSION:true}

@@ -1,0 +1,91 @@
+package com.dongkap.security.entity;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
+
+import org.hibernate.annotations.GenericGenerator;
+
+import com.dongkap.common.utils.SchemaDatabase;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper=false, exclude={"user"})
+@ToString(exclude={"user"})
+@Entity
+@Table(name = "sec_contact_user", schema = SchemaDatabase.SECURITY)
+public class ContactUserEntity extends BaseAuditEntity {
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2442773369159964802L;
+	
+	@Id
+	@GenericGenerator(name = "uuid", strategy = "uuid2")
+	@GeneratedValue(generator = "uuid")
+    @Column(name = "contact_user_uuid", nullable = false, unique=true)
+	private String id;
+	
+	@Column(name = "address", nullable = true)
+	private String address;
+
+	@Column(name = "country", nullable = true)
+	private String country;
+
+	@Column(name = "country_code", nullable = true)
+	private String countryCode;
+
+	@Column(name = "province", nullable = true)
+	private String province;
+
+	@Column(name = "province_code", nullable = true)
+	private String provinceCode;
+
+	@Column(name = "city", nullable = true)
+	private String city;
+
+	@Column(name = "city_code", nullable = true)
+	private String cityCode;
+
+	@Column(name = "district", nullable = true)
+	private String district;
+
+	@Column(name = "district_code", nullable = true)
+	private String districtCode;
+
+	@Column(name = "sub_district", nullable = true)
+	private String subDistrict;
+
+	@Column(name = "sub_district_code", nullable = true)
+	private String subDistrictCode;
+
+	@Column(name = "zipcode", nullable = true)
+	private String zipcode;
+
+	@Column(name = "phone_number", nullable = true)
+	private String phoneNumber;
+
+	@Column(name = "image", nullable = true)
+	private String image;
+
+	@Column(name = "description", nullable = true)
+	private String description;
+
+	@OneToOne(targetEntity = UserEntity.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_uuid", nullable = false, updatable = false)
+	private UserEntity user;
+
+}
