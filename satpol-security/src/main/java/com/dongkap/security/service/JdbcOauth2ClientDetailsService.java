@@ -44,22 +44,22 @@ public class JdbcOauth2ClientDetailsService extends JdbcClientDetailsService {
 	private static final String CLIENT_FIELDS = "client_secret, " + CLIENT_FIELDS_FOR_UPDATE;
 
 	private static final String BASE_FIND_STATEMENT = "select client_id, " + CLIENT_FIELDS
-			+ " from oauth_client_details";
+			+ " from security.oauth_client_details";
 
 	private static final String DEFAULT_FIND_STATEMENT = BASE_FIND_STATEMENT + " order by client_id";
 
 	private static final String DEFAULT_SELECT_STATEMENT = BASE_FIND_STATEMENT + " where client_id = ?";
 
-	private static final String DEFAULT_INSERT_STATEMENT = "insert into oauth_client_details (" + CLIENT_FIELDS
+	private static final String DEFAULT_INSERT_STATEMENT = "insert into security.oauth_client_details (" + CLIENT_FIELDS
 			+ ", client_id) values (?,?,?,?,?,?,?,?,?,?,?)";
 
-	private static final String DEFAULT_UPDATE_STATEMENT = "update oauth_client_details " + "set "
+	private static final String DEFAULT_UPDATE_STATEMENT = "update security.oauth_client_details " + "set "
 			+ CLIENT_FIELDS_FOR_UPDATE.replaceAll(", ", "=?, ") + "=? where client_id = ?";
 
-	private static final String DEFAULT_UPDATE_SECRET_STATEMENT = "update oauth_client_details "
+	private static final String DEFAULT_UPDATE_SECRET_STATEMENT = "update security.oauth_client_details "
 			+ "set client_secret = ? where client_id = ?";
 
-	private static final String DEFAULT_DELETE_STATEMENT = "delete from oauth_client_details where client_id = ?";
+	private static final String DEFAULT_DELETE_STATEMENT = "delete from security.oauth_client_details where client_id = ?";
 
 	private RowMapper<ClientDetails> rowMapper = new ClientDetailsRowMapper();
 

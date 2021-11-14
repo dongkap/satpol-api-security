@@ -24,8 +24,8 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper=false, exclude={"contactUser"})
-@ToString(exclude={"contactUser"})
+@EqualsAndHashCode(callSuper=false, exclude={"user"})
+@ToString(exclude={"user"})
 @Entity
 @Table(name = "sec_personal_info", schema = SchemaDatabase.SECURITY)
 public class PersonalInfoEntity extends BaseAuditEntity {
@@ -52,9 +52,15 @@ public class PersonalInfoEntity extends BaseAuditEntity {
 	
 	@Column(name = "date_of_birth", nullable = false)
 	private Date dateOfBirth;
+	
+	@Column(name = "height", nullable = true)
+	private double height;
+	
+	@Column(name = "weight", nullable = true)
+	private double weight;
 
-	@OneToOne(targetEntity = ContactUserEntity.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "contact_user_uuid", nullable = false, updatable = false)
-	private ContactUserEntity contactUser;
+	@OneToOne(targetEntity = UserEntity.class, fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_uuid", nullable = false, updatable = false)
+	private UserEntity user;
 
 }

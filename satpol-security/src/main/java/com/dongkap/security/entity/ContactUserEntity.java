@@ -78,9 +78,6 @@ public class ContactUserEntity extends BaseAuditEntity {
 	@Column(name = "phone_number", nullable = true)
 	private String phoneNumber;
 
-	@Column(name = "image", nullable = true)
-	private String image;
-
 	@Column(name = "description", nullable = true)
 	private String description;
 

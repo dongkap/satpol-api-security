@@ -41,7 +41,7 @@ public class FunctionImplService {
 	@Qualifier("menuRepo")
 	private MenuRepo menuRepo;
 	
-	@Value("${bcaf.locale}")
+	@Value("${dongkap.locale}")
 	private String locale;
 
 	@Transactional

@@ -32,31 +32,31 @@ public class JdbcOauth2TokenStore implements TokenStore {
 
 	private static final Logger LOG = LoggerFactory.getLogger(JdbcOauth2TokenStore.class);
 
-	private static final String DEFAULT_ACCESS_TOKEN_INSERT_STATEMENT = "insert into oauth_access_token (token_id, token, authentication_id, user_name, client_id, authentication, refresh_token) values (?, ?, ?, ?, ?, ?, ?)";
+	private static final String DEFAULT_ACCESS_TOKEN_INSERT_STATEMENT = "insert into security.oauth_access_token (token_id, token, authentication_id, user_name, client_id, authentication, refresh_token) values (?, ?, ?, ?, ?, ?, ?)";
 
-	private static final String DEFAULT_ACCESS_TOKEN_SELECT_STATEMENT = "select token_id, token from oauth_access_token where token_id = ?";
+	private static final String DEFAULT_ACCESS_TOKEN_SELECT_STATEMENT = "select token_id, token from security.oauth_access_token where token_id = ?";
 
-	private static final String DEFAULT_ACCESS_TOKEN_AUTHENTICATION_SELECT_STATEMENT = "select token_id, authentication from oauth_access_token where token_id = ?";
+	private static final String DEFAULT_ACCESS_TOKEN_AUTHENTICATION_SELECT_STATEMENT = "select token_id, authentication from security.oauth_access_token where token_id = ?";
 
-	private static final String DEFAULT_ACCESS_TOKEN_FROM_AUTHENTICATION_SELECT_STATEMENT = "select token_id, token from oauth_access_token where authentication_id = ?";
+	private static final String DEFAULT_ACCESS_TOKEN_FROM_AUTHENTICATION_SELECT_STATEMENT = "select token_id, token from security.oauth_access_token where authentication_id = ?";
 
-	private static final String DEFAULT_ACCESS_TOKENS_FROM_USERNAME_AND_CLIENT_SELECT_STATEMENT = "select token_id, token from oauth_access_token where user_name = ? and client_id = ?";
+	private static final String DEFAULT_ACCESS_TOKENS_FROM_USERNAME_AND_CLIENT_SELECT_STATEMENT = "select token_id, token from security.oauth_access_token where user_name = ? and client_id = ?";
 
-	private static final String DEFAULT_ACCESS_TOKENS_FROM_USERNAME_SELECT_STATEMENT = "select token_id, token from oauth_access_token where user_name = ?";
+	private static final String DEFAULT_ACCESS_TOKENS_FROM_USERNAME_SELECT_STATEMENT = "select token_id, token from security.oauth_access_token where user_name = ?";
 
-	private static final String DEFAULT_ACCESS_TOKENS_FROM_CLIENTID_SELECT_STATEMENT = "select token_id, token from oauth_access_token where client_id = ?";
+	private static final String DEFAULT_ACCESS_TOKENS_FROM_CLIENTID_SELECT_STATEMENT = "select token_id, token from security.oauth_access_token where client_id = ?";
 
 	private static final String DEFAULT_ACCESS_TOKEN_DELETE_STATEMENT = "delete from security.oauth_access_token where token_id = ?";
 
-	private static final String DEFAULT_ACCESS_TOKEN_DELETE_FROM_REFRESH_TOKEN_STATEMENT = "delete from oauth_access_token where refresh_token = ?";
+	private static final String DEFAULT_ACCESS_TOKEN_DELETE_FROM_REFRESH_TOKEN_STATEMENT = "delete from security.oauth_access_token where refresh_token = ?";
 
-	private static final String DEFAULT_REFRESH_TOKEN_INSERT_STATEMENT = "insert into oauth_refresh_token (token_id, token, authentication) values (?, ?, ?)";
+	private static final String DEFAULT_REFRESH_TOKEN_INSERT_STATEMENT = "insert into security.oauth_refresh_token (token_id, token, authentication) values (?, ?, ?)";
 
-	private static final String DEFAULT_REFRESH_TOKEN_SELECT_STATEMENT = "select token_id, token from oauth_refresh_token where token_id = ?";
+	private static final String DEFAULT_REFRESH_TOKEN_SELECT_STATEMENT = "select token_id, token from security.oauth_refresh_token where token_id = ?";
 
-	private static final String DEFAULT_REFRESH_TOKEN_AUTHENTICATION_SELECT_STATEMENT = "select token_id, authentication from oauth_refresh_token where token_id = ?";
+	private static final String DEFAULT_REFRESH_TOKEN_AUTHENTICATION_SELECT_STATEMENT = "select token_id, authentication from security.oauth_refresh_token where token_id = ?";
 
-	private static final String DEFAULT_REFRESH_TOKEN_DELETE_STATEMENT = "delete from oauth_refresh_token where token_id = ?";
+	private static final String DEFAULT_REFRESH_TOKEN_DELETE_STATEMENT = "delete from security.oauth_refresh_token where token_id = ?";
 
 	private String insertAccessTokenSql = DEFAULT_ACCESS_TOKEN_INSERT_STATEMENT;
 

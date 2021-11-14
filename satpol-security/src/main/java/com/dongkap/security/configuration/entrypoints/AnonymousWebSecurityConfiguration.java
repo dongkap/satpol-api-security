@@ -30,6 +30,10 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 
 import com.dongkap.common.utils.AnonymousPrecedenceOrder;
 import com.dongkap.common.utils.ResourceCode;
+import com.dongkap.security.authentication.HttpCookieOAuth2AuthorizationRequestRepository;
+import com.dongkap.security.authentication.OAuth2AuthenticationFailureHandler;
+import com.dongkap.security.authentication.OAuth2AuthenticationSuccessHandler;
+import com.dongkap.security.service.GrantOAuth2UserImplService;
 
 @Configuration
 @Order(AnonymousPrecedenceOrder.SECURITY)
@@ -53,6 +57,15 @@ public class AnonymousWebSecurityConfiguration extends WebSecurityConfigurerAdap
 	
     @Autowired
     private AuthenticationEntryPoint authenticationEntryPoint;
+
+    @Autowired
+    private OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+
+    @Autowired
+    private OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+
+    @Autowired
+    private GrantOAuth2UserImplService grantOAuth2UserService;
 	
 	@Autowired
 	public void configure(ClientDetailsServiceConfigurer clientDetails) throws Exception {
@@ -118,7 +131,19 @@ public class AnonymousWebSecurityConfiguration extends WebSecurityConfigurerAdap
         .and()
         	.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER)
         .and()
-        	.oauth2Login();
+    	.oauth2Login()
+        .authorizationEndpoint()
+            .baseUri("/oauth2/authorize")
+            .authorizationRequestRepository(cookieAuthorizationRequestRepository())
+            .and()
+        .redirectionEndpoint()
+            .baseUri("/oauth2/callback/*")
+            .and()
+        .userInfoEndpoint()
+            .userService(grantOAuth2UserService)
+            .and()
+    	.successHandler(oAuth2AuthenticationSuccessHandler)
+        .failureHandler(oAuth2AuthenticationFailureHandler);
 		// @formatter:on
 		http.setSharedObject(ClientDetailsService.class, clientDetailsService);
     }
@@ -131,6 +156,11 @@ public class AnonymousWebSecurityConfiguration extends WebSecurityConfigurerAdap
 	}
 
     @Bean
+    public HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository() {
+        return new HttpCookieOAuth2AuthorizationRequestRepository();
+    }
+
+    // @Bean
     public AuthorizationRequestRepository<OAuth2AuthorizationRequest> authorizationRequestRepository() {
         return new HttpSessionOAuth2AuthorizationRequestRepository();
     }

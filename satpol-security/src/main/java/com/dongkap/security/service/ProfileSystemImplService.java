@@ -107,7 +107,7 @@ public class ProfileSystemImplService {
 			dto.setSubDistrict(profile.getSubDistrict());
 			dto.setSubDistrictCode(profile.getSubDistrictCode());
 			dto.setZipcode(profile.getZipcode());
-			dto.setImage(profile.getImage());
+			dto.setImage(profile.getUser().getImage());
 			dto.setPhoneNumber(profile.getPhoneNumber());
 			dto.setDescription(profile.getDescription());
 			return dto;

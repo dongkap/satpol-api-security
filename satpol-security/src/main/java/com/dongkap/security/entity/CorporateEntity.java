@@ -26,8 +26,8 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper=false, exclude={"users"})
-@ToString(exclude={"users"})
+@EqualsAndHashCode(callSuper=false, exclude={"employees", "occupations"})
+@ToString(exclude={"employees", "occupations"})
 @Entity
 @Table(name = "sec_corporate", schema = SchemaDatabase.SECURITY)
 public class CorporateEntity extends BaseAuditEntity {
@@ -64,8 +64,12 @@ public class CorporateEntity extends BaseAuditEntity {
 	@Column(name = "fax_number")
 	private String faxNumber;
 
-	@ManyToMany(mappedBy = "corporates", targetEntity = UserEntity.class, fetch = FetchType.LAZY)
+	@ManyToMany(mappedBy = "corporate", targetEntity = EmployeeEntity.class, fetch = FetchType.LAZY)
 	@Fetch(FetchMode.SELECT)
-	private Set<UserEntity> users = new HashSet<UserEntity>();
+	private Set<EmployeeEntity> employees = new HashSet<EmployeeEntity>();
+
+	@ManyToMany(mappedBy = "corporate", targetEntity = OccupationEntity.class, fetch = FetchType.LAZY)
+	@Fetch(FetchMode.SELECT)
+	private Set<OccupationEntity> occupations = new HashSet<OccupationEntity>();
 
 }

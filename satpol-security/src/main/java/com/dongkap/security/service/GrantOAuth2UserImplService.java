@@ -61,7 +61,7 @@ public class GrantOAuth2UserImplService extends DefaultOAuth2UserService {
 
 	private OAuth2User doProcessOAuth2User(OAuth2UserRequest oAuth2UserRequest, OAuth2User oAuth2User) {
         OAuth2UserInfoDto oAuth2UserInfo = OAuth2UserInfoFactory.getOAuth2UserInfo(oAuth2UserRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes());
-        if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
+        if(StringUtils.hasText(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
 
@@ -97,13 +97,13 @@ public class GrantOAuth2UserImplService extends DefaultOAuth2UserService {
         userEntity.setEmail(oAuth2UserInfo.getEmail());
         userEntity.setFullname(oAuth2UserInfo.getName());
         userEntity.setProvider(AuthorizationProvider.valueOf(oAuth2UserRequest.getClientRegistration().getRegistrationId()).toString());
+        userEntity.setImage(oAuth2UserInfo.getImageUrl());
         userEntity.setAuthorityDefault(ROLE_END);
         AppEntity app = this.appRepo.findByAppCode(this.appCode);
         userEntity.getApps().add(app);
 		RoleEntity role = this.roleRepo.findByAuthority(ROLE_END);
         userEntity.getRoles().add(role);
         ContactUserEntity contactUserEntity = new ContactUserEntity();
-        contactUserEntity.setImage(oAuth2UserInfo.getImageUrl());
         contactUserEntity.setUser(userEntity);
         userEntity.setContactUser(contactUserEntity);
 		SettingsEntity settingsEntity = new SettingsEntity();
@@ -115,8 +115,8 @@ public class GrantOAuth2UserImplService extends DefaultOAuth2UserService {
     private UserEntity doUpdateUser(UserEntity userEntity, OAuth2UserInfoDto oAuth2UserInfo) {
     	if(userEntity.getFullname() == null)
     		userEntity.setFullname(oAuth2UserInfo.getName());
-    	if(userEntity.getContactUser().getImage() == null)
-    		userEntity.getContactUser().setImage(oAuth2UserInfo.getImageUrl());
+    	if(userEntity.getImage() == null)
+            userEntity.setImage(oAuth2UserInfo.getImageUrl());
         return this.userRepo.saveAndFlush(userEntity);
     }
 

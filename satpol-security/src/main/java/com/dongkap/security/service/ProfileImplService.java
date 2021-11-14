@@ -119,7 +119,7 @@ public class ProfileImplService {
 			dto.setSubDistrict(user.getContactUser().getSubDistrict());
 			dto.setSubDistrictCode(user.getContactUser().getSubDistrictCode());
 			dto.setZipcode(user.getContactUser().getZipcode());
-			dto.setImage(user.getContactUser().getImage());
+			dto.setImage(user.getImage());
 			dto.setPhoneNumber(user.getContactUser().getPhoneNumber());
 			dto.setDescription(user.getContactUser().getDescription());
 			return dto;
@@ -131,11 +131,11 @@ public class ProfileImplService {
 	public void doUpdatePhoto(Map<String, String> url, Authentication authentication, String locale) throws Exception {
 		UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
 		if (user.getUsername() != null && url != null) {
-			ContactUserEntity profile = this.contactUserRepo.findByUser_Username(user.getUsername());
-			profile.setImage(url.get("url"));
-			profile.setModifiedBy(user.getUsername());
-			profile.setModifiedDate(new Date());
-			this.contactUserRepo.save(profile);
+			UserEntity userEntity = this.userRepo.findByUsername(user.getUsername());
+			userEntity.setImage(url.get("url"));
+			userEntity.setModifiedBy(user.getUsername());
+			userEntity.setModifiedDate(new Date());
+			this.userRepo.save(userEntity);
 		} else
 			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
 	}

@@ -68,20 +68,14 @@ public class UserImplService extends CommonService {
 	@Value("${dongkap.app-code.default}")
 	private String appCode;
 	
-	@Value("${do.signature.aes.secret-key}")
+	@Value("${dongkap.signature.aes.secret-key}")
 	private String secretKey;
 	
-	@Value("${do.recaptcha.secret-key}")
+	@Value("${dongkap.recaptcha.secret-key}")
 	private String recaptchaSecretKey;
 	
-	@Value("${do.recaptcha.site-key}")
+	@Value("${dongkap.recaptcha.site-key}")
 	private String recaptchaSiteKey;
-	
-	@Value("${do.mobile.recaptcha.secret-key}")
-	private String recaptchaMobileSecretKey;
-	
-	@Value("${do.mobile.recaptcha.site-key}")
-	private String recaptchaMobileSiteKey;
 
     private static final String RECAPTCHA_URL = "https://www.google.com/recaptcha/api/siteverify";
 
@@ -110,7 +104,7 @@ public class UserImplService extends CommonService {
 				temp.setDistrict(value.getContactUser().getDistrict());
 				temp.setSubDistrict(value.getContactUser().getSubDistrict());
 				temp.setZipcode(value.getContactUser().getZipcode());
-				temp.setImage(value.getContactUser().getImage());
+				temp.setImage(value.getImage());
 				temp.setDescription(value.getContactUser().getDescription());
 			}
 			response.getData().add(temp);
@@ -121,15 +115,6 @@ public class UserImplService extends CommonService {
 	@Transactional(isolation = Isolation.READ_UNCOMMITTED, rollbackFor = SystemErrorException.class)
 	public ApiBaseResponse doSignUp(SignUpDto dto, String locale) throws Exception {
 		GoogleResponse googleResponse = this.recaptchaValidation(dto.getRecaptcha(), this.recaptchaSecretKey);
-		if(googleResponse.isSuccess()) {
-			return signUp(dto, locale);
-		} else
-			throw new SystemErrorException(ErrorCode.ERR_SCR0013);
-	}
-
-	@Transactional(isolation = Isolation.READ_UNCOMMITTED, rollbackFor = SystemErrorException.class)
-	public ApiBaseResponse doSignUpV2(SignUpDto dto, String locale) throws Exception {
-		GoogleResponse googleResponse = this.recaptchaValidation(dto.getRecaptcha(), this.recaptchaMobileSecretKey);
 		if(googleResponse.isSuccess()) {
 			return signUp(dto, locale);
 		} else

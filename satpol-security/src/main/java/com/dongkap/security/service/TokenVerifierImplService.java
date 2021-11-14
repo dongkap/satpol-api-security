@@ -65,7 +65,7 @@ public class TokenVerifierImplService {
 		} else {
 			throw new OAuth2AuthenticationProcessingException("Sorry! Login with " + provider + " is not supportd yet.");
 		}
-		if(StringUtils.isEmpty(oAuth2UserInfo.getEmail())) {
+		if(StringUtils.hasText(oAuth2UserInfo.getEmail())) {
             throw new OAuth2AuthenticationProcessingException("Email not found from OAuth2 provider");
         }
 
@@ -120,13 +120,13 @@ public class TokenVerifierImplService {
         userEntity.setEmail(oAuth2UserInfo.getEmail());
         userEntity.setFullname(oAuth2UserInfo.getName());
         userEntity.setProvider(provider);
+        userEntity.setImage(oAuth2UserInfo.getImageUrl());
         userEntity.setAuthorityDefault(ROLE_END);
         AppEntity app = this.appRepo.findByAppCode(this.appCode);
         userEntity.getApps().add(app);
 		RoleEntity role = this.roleRepo.findByAuthority(ROLE_END);
         userEntity.getRoles().add(role);
         ContactUserEntity contactUserEntity = new ContactUserEntity();
-        contactUserEntity.setImage(oAuth2UserInfo.getImageUrl());
         contactUserEntity.setUser(userEntity);
         userEntity.setContactUser(contactUserEntity);
 		SettingsEntity settingsEntity = new SettingsEntity();
@@ -140,8 +140,8 @@ public class TokenVerifierImplService {
     		userEntity.setUsername(oAuth2UserInfo.getId());
     	if(userEntity.getFullname() == null)
     		userEntity.setFullname(oAuth2UserInfo.getName());
-    	if(userEntity.getContactUser().getImage() == null)
-    		userEntity.getContactUser().setImage(oAuth2UserInfo.getImageUrl());
+    	if(userEntity.getImage() == null)
+            userEntity.setImage(oAuth2UserInfo.getImageUrl());
         return this.userRepo.saveAndFlush(userEntity);
     }
 

@@ -25,14 +25,14 @@ public class SecurityTokenEnhancer implements TokenEnhancer {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	
-	@Value("${bcaf.client-id.web}")
+	@Value("${dongkap.client-id.web}")
 	private String clientIdWeb;
 	
 	@Autowired
 	@Qualifier("menuService")
 	private MenuImplService menuService;
 	
-	@Value("${bcaf.signature.public-key}")
+	@Value("${dongkap.signature.public-key}")
 	private String publicKey;
 	
 	@Autowired
