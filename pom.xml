@@ -12,15 +12,25 @@
 	</modules>
 
     <properties>
-        <!-- LIBRARY VERSION PROPERTIES -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
+        <java.version>12</java.version>
 		<satpol-library.version>1.0.0-SNAPSHOT</satpol-library.version>
-        <activemq.version>5.9.1</activemq.version>
-        <apache.cxf.version>2.7.7</apache.cxf.version>
-        <bcpg-jdk15on.version>1.47</bcpg-jdk15on.version>
-        <bcpg-jdk16.version>1.46</bcpg-jdk16.version>
-        <bsf.version>2.4.0</bsf.version>
+        <spring-batch-integration.version>3.0.7.RELEASE</spring-batch-integration.version>
+        <spring-boot-maven.version>2.3.12.RELEASE</spring-boot-maven.version>
+        <spring-boot.version>2.3.12.RELEASE</spring-boot.version>
+        <spring-loaded.version>1.2.8.RELEASE</spring-loaded.version>
+        <spring-support.version>1.2.9</spring-support.version>
+        <spring.cloud.version>2.2.8.RELEASE</spring.cloud.version>
+        <spring.cloud.kafka.version>1.3.0.RELEASE</spring.cloud.kafka.version>
+        <spring.cloud.zipkin.version>2.3.12.RELEASE</spring.cloud.zipkin.version>
+        <zipkin.server.version>2.2.1</zipkin.server.version>
+        <zipkin.elasticsearch.version>2.2.1</zipkin.elasticsearch.version>
+        <oauth.version>2.3.8.RELEASE</oauth.version>
+        <jwt.version>1.0.11.RELEASE</jwt.version>
+        <hibernate.version>5.4.32.Final</hibernate.version>
+        <cloud.commons>2.2.8.RELEASE</cloud.commons>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-fileupload.version>1.3</commons-fileupload.version>
         <commons-httpclient.version>3.1</commons-httpclient.version>
@@ -28,53 +38,36 @@
         <commons-lang.version>2.6</commons-lang.version>
         <commons-lang3.version>3.4</commons-lang3.version>
         <commons-validator.version>1.5.0</commons-validator.version>
+        <netflix.common.util>0.3.0</netflix.common.util>
+        <activemq.version>5.9.1</activemq.version>
+        <apache.cxf.version>2.7.7</apache.cxf.version>
+        <bcpg-jdk15on.version>1.47</bcpg-jdk15on.version>
+        <bcpg-jdk16.version>1.46</bcpg-jdk16.version>
+        <bsf.version>2.4.0</bsf.version>
         <google-kaptcha.version>2.3.2</google-kaptcha.version>
         <google.api-client.version>1.30.10</google.api-client.version>
-        <hibernate.version>5.4.32.Final</hibernate.version>
         <jasperreports.version>6.3.1</jasperreports.version>
         <java.jms.version>1.1</java.jms.version>
-        <java.version>12</java.version>
         <jersey.version>1.19.1</jersey.version>
         <jgroups.version>3.6.4.Final</jgroups.version>
-        <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <neo4j-cypher-compiler-2.2.version>2.2.5</neo4j-cypher-compiler-2.2.version>
         <org.codehaus.jackson.version>2.6.5</org.codehaus.jackson.version>
         <org.neo4j.version>2.1.5</org.neo4j.version>
         <poi.version>3.13</poi.version>
         <quartz.version>2.2.1</quartz.version>
+        <modelmapper.version>1.1.0</modelmapper.version>
         <scala-library.version>2.10.4</scala-library.version>
-        <spring-batch-integration.version>3.0.7.RELEASE</spring-batch-integration.version>
-        <spring-boot-maven.version>2.3.12.RELEASE</spring-boot-maven.version>
-        <spring-boot.version>2.3.12.RELEASE</spring-boot.version>
-        <spring-loaded.version>1.2.8.RELEASE</spring-loaded.version>
-        <spring-support.version>1.2.9</spring-support.version>
-        <spring.cloud.version>2.2.8.RELEASE</spring.cloud.version>
         <thymeleaf-security.version>3.0.2.RELEASE</thymeleaf-security.version>
         <thymeleaf.version>3.0.6.RELEASE</thymeleaf.version>
         <thymeleaf-layout-dialect.version>2.2.2</thymeleaf-layout-dialect.version>
         <xalan.version>2.7.1</xalan.version>
-        <netflix.common.util>0.3.0</netflix.common.util>
         <svnkit.version>1.9.0</svnkit.version>
-        <mssql.version>4.0</mssql.version>
-        <spring.cloud.zipkin.version>2.3.12.RELEASE</spring.cloud.zipkin.version>
-        <spring.cloud.kafka.version>1.3.0.RELEASE</spring.cloud.kafka.version>
-        <zipkin.server.version>2.2.1</zipkin.server.version>
-        <zipkin.elasticsearch.version>2.2.1</zipkin.elasticsearch.version>
-        <hazelcast.version>3.9</hazelcast.version>
         <logstash-encoder.version>4.6</logstash-encoder.version>
         <swagger.version>2.7.0</swagger.version>
         <javax.mail.version>1.4.7</javax.mail.version>
-        <failOnMissingWebXml>false</failOnMissingWebXml>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
         <logging.path>../log/</logging.path>
-        <logging.hibernate.level>ERROR</logging.hibernate.level>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <logstash.host>telkomsigma-external_logstash:5000</logstash.host>
-        <modelmapper.version>1.1.0</modelmapper.version>
-        <oauth.version>2.3.8.RELEASE</oauth.version>
-        <jwt.version>1.0.11.RELEASE</jwt.version>
-        <cloud.commons>2.2.8.RELEASE</cloud.commons>
-        <!-- APPLICATION FINAL NAME -->
     </properties>
 
     <build>
@@ -107,16 +100,7 @@
 				<artifactId>satpol-feign</artifactId>
 				<version>${satpol-library.version}</version>
 			</dependency>
-            <dependency>
-                <groupId>org.modelmapper</groupId>
-                <artifactId>modelmapper</artifactId>
-                <version>${modelmapper.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.netflix.netflix-commons</groupId>
-                <artifactId>netflix-commons-util</artifactId>
-                <version>${netflix.common.util}</version>
-            </dependency>
+            <!-- Spring Framework -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-starter-zuul</artifactId>
@@ -147,7 +131,6 @@
                 <artifactId>spring-cloud-commons</artifactId>
                 <version>${cloud.commons}</version>
             </dependency>
-            <!-- SPRING-BOOT ... -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-parent</artifactId>
@@ -155,11 +138,66 @@
                 <version>${spring-boot.version}</version>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-support</artifactId>
+                <version>${spring-support.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.batch</groupId>
+                <artifactId>spring-batch-integration</artifactId>
+                <version>${spring-batch-integration.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-eureka</artifactId>
+                <version>${spring.cloud.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-feign</artifactId>
+                <version>${spring.cloud.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-hystrix</artifactId>
+                <version>${spring.cloud.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-sleuth-zipkin</artifactId>
+                <version>${spring.cloud.zipkin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-stream-kafka</artifactId>
+                <version>${spring.cloud.kafka.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-stream-test-support</artifactId>
+                <version>${spring.cloud.zipkin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-sleuth</artifactId>
+                <version>${spring.cloud.zipkin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth</groupId>
+                <artifactId>spring-security-oauth2</artifactId>
+                <version>${oauth.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-jwt</artifactId>
+                <version>${jwt.version}</version>
+            </dependency>
             <!-- GOOGLE KAPTCHA -->
             <dependency>
                 <groupId>com.github.penggle</groupId>
                 <artifactId>kaptcha</artifactId>
-                <version>2.3.2</version>
+                <version>${google-kaptcha.version}</version>
             </dependency>
             <!-- APACHE COMMON FILE UPLOAD -->
             <dependency>
@@ -203,21 +241,6 @@
                 <groupId>bsf</groupId>
                 <artifactId>bsf</artifactId>
                 <version>${bsf.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.hazelcast</groupId>
-                <artifactId>hazelcast</artifactId>
-                <version>${hazelcast.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.hazelcast</groupId>
-                <artifactId>hazelcast-client</artifactId>
-                <version>${hazelcast.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.hazelcast</groupId>
-                <artifactId>hazelcast-spring</artifactId>
-                <version>${hazelcast.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.scala-lang</groupId>
@@ -265,11 +288,6 @@
                 <version>${quartz.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-support</artifactId>
-                <version>${spring-support.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi</artifactId>
                 <version>${poi.version}</version>
@@ -280,11 +298,6 @@
                 <version>${commons-httpclient.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.batch</groupId>
-                <artifactId>spring-batch-integration</artifactId>
-                <version>${spring-batch-integration.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>commons-validator</groupId>
                 <artifactId>commons-validator</artifactId>
                 <version>${commons-validator.version}</version>
@@ -293,21 +306,6 @@
                 <groupId>net.sf.jasperreports</groupId>
                 <artifactId>jasperreports</artifactId>
                 <version>${jasperreports.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-eureka</artifactId>
-                <version>${spring.cloud.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-feign</artifactId>
-                <version>${spring.cloud.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-hystrix</artifactId>
-                <version>${spring.cloud.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.jersey</groupId>
@@ -325,11 +323,6 @@
                 <version>${jersey.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-c3p0</artifactId>
-                <version>${hibernate.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>javax.servlet</groupId>
                 <artifactId>javax.servlet-api</artifactId>
                 <version>${javax.servlet-api.version}</version>
@@ -339,31 +332,11 @@
                 <artifactId>svnkit</artifactId>
                 <version>${svnkit.version}</version>
             </dependency>
-            <dependency>
-                <groupId>com.microsoft.sqlserver</groupId>
-                <artifactId>sqljdbc4</artifactId>
-                <version>${mssql.version}</version>
-            </dependency>
 			<dependency>
 				<groupId>com.google.api-client</groupId>
 				<artifactId>google-api-client</artifactId>
 				<version>${google.api-client.version}</version>
 			</dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-sleuth-zipkin</artifactId>
-                <version>${spring.cloud.zipkin.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-stream-kafka</artifactId>
-                <version>${spring.cloud.kafka.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-stream-test-support</artifactId>
-                <version>${spring.cloud.zipkin.version}</version>
-            </dependency>
             <dependency>
                 <groupId>io.zipkin.java</groupId>
                 <artifactId>zipkin-server</artifactId>
@@ -373,11 +346,6 @@
                 <groupId>io.zipkin.java</groupId>
                 <artifactId>zipkin-autoconfigure-ui</artifactId>
                 <version>${zipkin.server.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-starter-sleuth</artifactId>
-                <version>${spring.cloud.zipkin.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.zipkin.java</groupId>
@@ -419,14 +387,14 @@
                 <version>${swagger.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.security.oauth</groupId>
-                <artifactId>spring-security-oauth2</artifactId>
-                <version>${oauth.version}</version>
+                <groupId>org.modelmapper</groupId>
+                <artifactId>modelmapper</artifactId>
+                <version>${modelmapper.version}</version>
             </dependency>
             <dependency>
-                <groupId>org.springframework.security</groupId>
-                <artifactId>spring-security-jwt</artifactId>
-                <version>${jwt.version}</version>
+                <groupId>com.netflix.netflix-commons</groupId>
+                <artifactId>netflix-commons-util</artifactId>
+                <version>${netflix.common.util}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

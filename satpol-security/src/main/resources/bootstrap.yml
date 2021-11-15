@@ -101,6 +101,7 @@ logging:
     org.apache.tomcat: INFO
     com.mchange.v2.async.ThreadPoolAsynchronousRunner: INFO
     com.github.isrsal.logging.LoggingFilter: INFO
+    org.apache.catalina.session.ManagerBase.level: INFO
 
 ---
 spring:

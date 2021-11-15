@@ -65,13 +65,13 @@ public class ResourceServerProfileAdapter extends ResourceServerConfigurerAdapte
         .antMatchers(HttpMethod.PUT,	resourcePath+ "/trx/put/**")
         	.access("#oauth2.hasScope('write')")
         .antMatchers(HttpMethod.GET,	resourcePath+ "/vw/auth/**")
-			.access("#oauth2.hasScope('trust') and hasAnyAuthority('SYS_ADMIN')")
+			.access("#oauth2.hasScope('trust') and hasAnyAuthority('SYS_ADMINISTRATOR', 'SYS_STAFF_ADMIN', 'SYS_MANAGER', 'SYS_SUPERVISOR')")
         .antMatchers(HttpMethod.POST,	resourcePath+ "/vw/auth/**")
-			.access("#oauth2.hasScope('trust') and hasAnyAuthority('SYS_ADMIN')")
+			.access("#oauth2.hasScope('trust') and hasAnyAuthority('SYS_ADMINISTRATOR', 'SYS_STAFF_ADMIN', 'SYS_MANAGER', 'SYS_SUPERVISOR')")
         .antMatchers(HttpMethod.POST,	resourcePath+ "/trx/auth/**")
-			.access("#oauth2.hasScope('trust') and hasAnyAuthority('SYS_ADMIN')")
+			.access("#oauth2.hasScope('trust') and hasAnyAuthority('SYS_ADMINISTRATOR', 'SYS_STAFF_ADMIN', 'SYS_MANAGER', 'SYS_SUPERVISOR')")
         .antMatchers(HttpMethod.DELETE,	resourcePath+ "/trx/auth/**")
-			.access("#oauth2.hasScope('trust') and hasAnyAuthority('SYS_ADMIN')")
+			.access("#oauth2.hasScope('trust') and hasAnyAuthority('SYS_ADMINISTRATOR', 'SYS_STAFF_ADMIN', 'SYS_MANAGER', 'SYS_SUPERVISOR')")
         .anyRequest().denyAll();
         // @formatter:on
     }
