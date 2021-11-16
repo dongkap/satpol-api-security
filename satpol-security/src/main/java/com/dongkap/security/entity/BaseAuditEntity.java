@@ -26,7 +26,7 @@ public class BaseAuditEntity implements Serializable {
 
 	@Column(name = "version", nullable = false)
 	@Version
-	protected int version = 1;
+	protected Integer version = 1;
 
 	@Column(name = "is_active", nullable = false)
     protected boolean active = true;
