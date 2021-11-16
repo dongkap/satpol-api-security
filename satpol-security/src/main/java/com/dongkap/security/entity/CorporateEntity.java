@@ -43,8 +43,8 @@ public class CorporateEntity extends BaseAuditEntity {
 	@Column(name = "corporate_uuid", nullable = false, unique = true)
 	private String id;
 
-	@Column(name = "corporate_id", nullable = false, unique = true)
-	private String corporateId;
+	@Column(name = "corporate_code", nullable = false, unique = true)
+	private String corporateCode;
 
 	@Column(name = "corporate_name", nullable = false)
 	private String corporateName;
