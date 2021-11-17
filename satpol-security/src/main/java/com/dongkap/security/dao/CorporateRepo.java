@@ -7,6 +7,6 @@ import com.dongkap.security.entity.CorporateEntity;
 
 public interface CorporateRepo extends JpaRepository<CorporateEntity, String>, JpaSpecificationExecutor<CorporateEntity> {
 
-	CorporateEntity findByCorporateId(String corporateId);
+	CorporateEntity findByCorporateCode(String corporateCode);
 	
 }
