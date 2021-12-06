@@ -48,13 +48,6 @@ public class BaseAuditEntity implements Serializable {
     @Column(name = "modified_by", insertable = false)
     @LastModifiedBy
     protected String modifiedBy;
-
-	public void updateTimeStamps() {
-		modifiedDate = new Date();
-		if (createdDate == null) {
-			createdDate = new Date();
-		}
-	}
 	
 	public void setActive(String activeSts) {
 		if (activeSts != null && activeSts.equals("Active")) {

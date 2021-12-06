@@ -17,12 +17,16 @@ import com.dongkap.common.security.UserPrincipal;
 import com.dongkap.common.utils.ErrorCode;
 import com.dongkap.dto.common.ApiBaseResponse;
 import com.dongkap.dto.security.FunctionRequestDto;
+import com.dongkap.dto.security.FunctionRoleRequestDto;
+import com.dongkap.dto.security.RoleDto;
 import com.dongkap.security.dao.FunctionRepo;
 import com.dongkap.security.dao.MenuRepo;
 import com.dongkap.security.dao.RoleRepo;
+import com.dongkap.security.dao.SystemAuthorityRepo;
 import com.dongkap.security.entity.FunctionEntity;
 import com.dongkap.security.entity.MenuEntity;
 import com.dongkap.security.entity.RoleEntity;
+import com.dongkap.security.entity.SystemAuthorityEntity;
 
 @Service("functionService")
 public class FunctionImplService {
@@ -40,9 +44,69 @@ public class FunctionImplService {
 	@Autowired
 	@Qualifier("menuRepo")
 	private MenuRepo menuRepo;
+
+	@Autowired
+	private SystemAuthorityRepo systemAuthorityRepo;
 	
 	@Value("${dongkap.locale}")
 	private String locale;
+
+	@Transactional
+	public ApiBaseResponse doPostFunctionRole(FunctionRoleRequestDto p_dto, UserPrincipal userPrincipal, String p_locale) throws Exception {
+		if (p_dto != null) {
+			RoleEntity role = this.postRole(p_dto.getRole(), p_locale);
+			if(p_dto.getMain() == null)
+				throw new SystemErrorException(ErrorCode.ERR_SYS0404);
+			try {
+				List<FunctionEntity> functions = new ArrayList<FunctionEntity>();
+				List<MenuEntity> mainMenus = this.menuRepo.loadAllMenuInId(p_dto.getMain());
+				List<MenuEntity> extraMenus = this.menuRepo.loadAllMenuInId(p_dto.getExtra());
+				for(MenuEntity menu: mainMenus) {
+					final FunctionEntity function = new FunctionEntity();
+					function.setAccess("read,write,trust");
+					function.setMenuId(menu.getId());
+					function.setRoleId(role.getId());
+					function.setCreatedBy(userPrincipal.getUsername());
+					function.setCreatedDate(new Date());
+					functions.add(function);
+				}
+				for(MenuEntity menu: extraMenus) {
+					final FunctionEntity function = new FunctionEntity();
+					function.setAccess("read,write,trust");
+					function.setMenuId(menu.getId());
+					function.setRoleId(role.getId());
+					function.setCreatedBy(userPrincipal.getUsername());
+					function.setCreatedDate(new Date());
+					functions.add(function);
+				}
+				this.functionRepo.deleteFunctionRole(role.getId());
+				this.functionRepo.saveAll(functions);
+			} catch (Exception e) {
+				throw new SystemErrorException(ErrorCode.ERR_SYS0500);
+			} 
+			return null;
+		} else
+			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
+	}
+
+	private RoleEntity postRole(RoleDto request, String username) throws Exception {
+		if (request.getAuthority() != null && request.getDescription() != null) {
+			RoleEntity role = this.roleRepo.findByAuthority(request.getAuthority());
+			SystemAuthorityEntity sysAuth = this.systemAuthorityRepo.findByCode(request.getGroup().getCode());
+			if (sysAuth == null) {
+				throw new SystemErrorException(ErrorCode.ERR_SYS0404);
+			}
+			if (role == null) {
+				role = new RoleEntity();
+				role.setAuthority(request.getAuthority());
+			}
+			role.setSysAuth(sysAuth);
+			role.setDescription(request.getDescription());
+			return roleRepo.saveAndFlush(role);
+		} else {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
+		}
+	}
 
 	@Transactional
 	public ApiBaseResponse doPostFunction(FunctionRequestDto p_dto, UserPrincipal userPrincipal, String p_locale) throws Exception {

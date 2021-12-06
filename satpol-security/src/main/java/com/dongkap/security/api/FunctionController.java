@@ -19,6 +19,7 @@ import com.dongkap.common.utils.ResourceCode;
 import com.dongkap.common.utils.SuccessCode;
 import com.dongkap.dto.common.ApiBaseResponse;
 import com.dongkap.dto.security.FunctionRequestDto;
+import com.dongkap.dto.security.FunctionRoleRequestDto;
 import com.dongkap.security.service.FunctionImplService;
 
 @RestController
@@ -28,6 +29,15 @@ public class FunctionController extends BaseControllerException {
 
 	@Autowired
 	private FunctionImplService functionService;
+	
+	@ResponseSuccess(SuccessCode.OK_DEFAULT)
+	@RequestMapping(value = "/trx/auth/function-role/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ApiBaseResponse> postFunctionRole(Authentication authentication,
+													   @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
+													   @RequestBody(required = true) FunctionRoleRequestDto p_dto) throws Exception {
+		UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+		return new ResponseEntity<ApiBaseResponse>(functionService.doPostFunctionRole(p_dto, userPrincipal, locale), HttpStatus.OK);
+	}
 	
 	@ResponseSuccess(SuccessCode.OK_DEFAULT)
 	@RequestMapping(value = "/trx/auth/function/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
