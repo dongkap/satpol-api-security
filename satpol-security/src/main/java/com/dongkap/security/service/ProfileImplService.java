@@ -107,21 +107,23 @@ public class ProfileImplService {
 			dto.setUsername(p_username);
 			dto.setName(user.getName());
 			dto.setEmail(user.getEmail());
-			dto.setAddress(user.getContactUser().getAddress());
-			dto.setCountry(user.getContactUser().getCountry());
-			dto.setCountryCode(user.getContactUser().getCountryCode());
-			dto.setProvince(user.getContactUser().getProvince());
-			dto.setProvinceCode(user.getContactUser().getProvinceCode());
-			dto.setCity(user.getContactUser().getCity());
-			dto.setCityCode(user.getContactUser().getCityCode());
-			dto.setDistrict(user.getContactUser().getDistrict());
-			dto.setDistrictCode(user.getContactUser().getDistrictCode());
-			dto.setSubDistrict(user.getContactUser().getSubDistrict());
-			dto.setSubDistrictCode(user.getContactUser().getSubDistrictCode());
-			dto.setZipcode(user.getContactUser().getZipcode());
+			if(user.getContactUser() != null) {
+				dto.setAddress(user.getContactUser().getAddress());
+				dto.setCountry(user.getContactUser().getCountry());
+				dto.setCountryCode(user.getContactUser().getCountryCode());
+				dto.setProvince(user.getContactUser().getProvince());
+				dto.setProvinceCode(user.getContactUser().getProvinceCode());
+				dto.setCity(user.getContactUser().getCity());
+				dto.setCityCode(user.getContactUser().getCityCode());
+				dto.setDistrict(user.getContactUser().getDistrict());
+				dto.setDistrictCode(user.getContactUser().getDistrictCode());
+				dto.setSubDistrict(user.getContactUser().getSubDistrict());
+				dto.setSubDistrictCode(user.getContactUser().getSubDistrictCode());
+				dto.setZipcode(user.getContactUser().getZipcode());	
+				dto.setPhoneNumber(user.getContactUser().getPhoneNumber());
+				dto.setDescription(user.getContactUser().getDescription());
+			}
 			dto.setImage(user.getImage());
-			dto.setPhoneNumber(user.getContactUser().getPhoneNumber());
-			dto.setDescription(user.getContactUser().getDescription());
 			return dto;
 		} else
 			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
