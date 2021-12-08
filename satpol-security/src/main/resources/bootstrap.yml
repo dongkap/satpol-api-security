@@ -77,6 +77,11 @@ dongkap:
     web: smart-core
   app-code:
     default: SMART
+  file:
+    path:
+      tmp: ${PATH_TMP:./tmp/temps/}
+      image:
+        profile: ${PATH_IMAGE_PROFILE:./tmp/image/profile/}
   oauth2:
     # After successfully authenticating with the OAuth2 Provider,
     # we'll be generating an auth token for the user and sending the token to the
