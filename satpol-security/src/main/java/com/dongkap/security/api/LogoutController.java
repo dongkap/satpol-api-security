@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationDetails;
-import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,7 +24,7 @@ import com.dongkap.dto.common.ApiBaseResponse;
 public class LogoutController extends BaseControllerException {
 
 	@Autowired
-	private ConsumerTokenServices tokenServices;
+	private DefaultTokenServices tokenServices;
 
 	@ResponseSuccess(SuccessCode.OK_LOGOUT)
 	@RequestMapping(value = "/oauth/token/revoke", method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_VALUE)

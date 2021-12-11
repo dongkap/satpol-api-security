@@ -22,7 +22,6 @@ import com.dongkap.security.dao.AppRepo;
 import com.dongkap.security.dao.RoleRepo;
 import com.dongkap.security.dao.UserRepo;
 import com.dongkap.security.entity.AppEntity;
-import com.dongkap.security.entity.ContactUserEntity;
 import com.dongkap.security.entity.RoleEntity;
 import com.dongkap.security.entity.SettingsEntity;
 import com.dongkap.security.entity.UserEntity;
@@ -103,9 +102,6 @@ public class GrantOAuth2UserImplService extends DefaultOAuth2UserService {
         userEntity.getApps().add(app);
 		RoleEntity role = this.roleRepo.findByAuthority(ROLE_END);
         userEntity.getRoles().add(role);
-        ContactUserEntity contactUserEntity = new ContactUserEntity();
-        contactUserEntity.setUser(userEntity);
-        userEntity.setContactUser(contactUserEntity);
 		SettingsEntity settingsEntity = new SettingsEntity();
 		settingsEntity.setUser(userEntity);
 		userEntity.setSettings(settingsEntity);

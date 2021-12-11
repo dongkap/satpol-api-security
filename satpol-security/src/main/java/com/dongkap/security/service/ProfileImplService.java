@@ -1,5 +1,7 @@
 package com.dongkap.security.service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
 
@@ -13,12 +15,19 @@ import org.springframework.transaction.annotation.Transactional;
 import com.dongkap.common.exceptions.SystemErrorException;
 import com.dongkap.common.pattern.PatternGlobal;
 import com.dongkap.common.security.UserPrincipal;
+import com.dongkap.common.utils.DateUtil;
 import com.dongkap.common.utils.ErrorCode;
 import com.dongkap.dto.common.ApiBaseResponse;
+import com.dongkap.dto.security.ContactUserDto;
+import com.dongkap.dto.security.PersonalInfoDto;
 import com.dongkap.dto.security.ProfileDto;
 import com.dongkap.security.dao.ContactUserRepo;
+import com.dongkap.security.dao.ParameterI18nRepo;
+import com.dongkap.security.dao.PersonalInfoRepo;
 import com.dongkap.security.dao.UserRepo;
 import com.dongkap.security.entity.ContactUserEntity;
+import com.dongkap.security.entity.ParameterI18nEntity;
+import com.dongkap.security.entity.PersonalInfoEntity;
 import com.dongkap.security.entity.UserEntity;
 
 @Service("profileService")
@@ -27,10 +36,16 @@ public class ProfileImplService {
 	protected Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 
 	@Autowired
+	private UserRepo userRepo;
+
+	@Autowired
 	private ContactUserRepo contactUserRepo;
 
 	@Autowired
-	private UserRepo userRepo;
+	private PersonalInfoRepo personalInfoRepo;
+
+	@Autowired
+	private ParameterI18nRepo parameterI18nRepo;
 
 	@Transactional
 	public ApiBaseResponse doUpdateProfile(ProfileDto p_dto,  UserPrincipal p_user, String p_locale) throws Exception {
@@ -38,93 +53,30 @@ public class ProfileImplService {
 			UserEntity user = this.userRepo.loadByUsername(p_user.getUsername());
 			if(user == null)
 				throw new SystemErrorException(ErrorCode.ERR_SYS0404);
-			ContactUserEntity contactUser = user.getContactUser(); 
-			if (contactUser != null) {
-				if (p_dto.getAddress() != null)
-					contactUser.setAddress(p_dto.getAddress());
-				contactUser.setCountry(p_dto.getCountry());
-				contactUser.setCountryCode(p_dto.getCountryCode());
-				contactUser.setProvince(p_dto.getProvince());
-				contactUser.setProvinceCode(p_dto.getProvinceCode());
-				contactUser.setCity(p_dto.getCity());
-				contactUser.setCityCode(p_dto.getCityCode());
-				contactUser.setDistrict(p_dto.getDistrict());
-				contactUser.setDistrictCode(p_dto.getDistrictCode());
-				contactUser.setSubDistrict(p_dto.getSubDistrict());
-				contactUser.setSubDistrictCode(p_dto.getSubDistrictCode());
-				contactUser.setZipcode(p_dto.getZipcode());
-				contactUser.setDescription(p_dto.getDescription());
-				if (p_dto.getName() != null)
-					user.setFullname(p_dto.getName());
-				if (!p_dto.getEmail().equals(user.getEmail())) {
-					if (p_dto.getEmail().matches(PatternGlobal.EMAIL.getRegex())) {
-						user = this.userRepo.loadByUsernameOrEmail(p_dto.getEmail(), p_dto.getEmail());
-						if(user == null) {
-							user = contactUser.getUser();
-							user.setEmail(p_dto.getEmail());
-							contactUser.setUser(user);
-						} else {
-							throw new SystemErrorException(ErrorCode.ERR_SCR0010);
-						}
-					} else
-						throw new SystemErrorException(ErrorCode.ERR_SCR0008);
-				}
-				if (p_dto.getPhoneNumber() != null) {
-					if (p_dto.getPhoneNumber().matches(PatternGlobal.PHONE_NUMBER.getRegex())) {
-						contactUser.setPhoneNumber(p_dto.getPhoneNumber());	
-					} else
-						throw new SystemErrorException(ErrorCode.ERR_SCR0007A);
-				}
-				contactUser.setModifiedBy(p_user.getUsername());
-				contactUser.setModifiedDate(new Date());
-				this.contactUserRepo.save(contactUser);
+			if (p_dto.getName() == null) {
+				throw new SystemErrorException(ErrorCode.ERR_SYS0405);
+			}
+			if (!p_dto.getEmail().equals(user.getEmail())) {
+				if (p_dto.getEmail().matches(PatternGlobal.EMAIL.getRegex())) {
+					UserEntity tmpUser = this.userRepo.loadByUsernameOrEmail(p_dto.getEmail(), p_dto.getEmail());
+					if(tmpUser == null) {
+						user.setEmail(p_dto.getEmail());
+					} else {
+						throw new SystemErrorException(ErrorCode.ERR_SCR0010);
+					}
+				} else
+					throw new SystemErrorException(ErrorCode.ERR_SCR0008);
+			}
+			user.setFullname(p_dto.getName());
+			this.userRepo.save(user);
+
+			if(p_dto.getContact() != null) {
+				this.updateContact(p_dto, user);
+			}
+			if(p_dto.getPersonalInfo() != null) {
+				this.updatePersonalInfo(p_dto, user);
 			}
 			return null;
-		} else
-			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
-	}
-
-	public ProfileDto getProfile(Authentication authentication, String p_locale) throws Exception {
-		UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
-		if (user.getUsername() != null) {
-			return getProfile(user.getUsername(), p_locale);
-		} else
-			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
-	}
-	
-	public ProfileDto getProfileOtherAuth(Map<String, Object> param, String p_locale) throws Exception {
-		if (!param.isEmpty()) {
-			return getProfile(param.get("username").toString(), p_locale);
-		} else
-			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
-	}
-	
-	@Transactional
-	private ProfileDto getProfile(String p_username, String p_locale) throws Exception {
-		if (p_username != null) {
-			ProfileDto dto = new ProfileDto();
-			UserEntity user = this.userRepo.loadByUsername(p_username);
-			dto.setUsername(p_username);
-			dto.setName(user.getName());
-			dto.setEmail(user.getEmail());
-			if(user.getContactUser() != null) {
-				dto.setAddress(user.getContactUser().getAddress());
-				dto.setCountry(user.getContactUser().getCountry());
-				dto.setCountryCode(user.getContactUser().getCountryCode());
-				dto.setProvince(user.getContactUser().getProvince());
-				dto.setProvinceCode(user.getContactUser().getProvinceCode());
-				dto.setCity(user.getContactUser().getCity());
-				dto.setCityCode(user.getContactUser().getCityCode());
-				dto.setDistrict(user.getContactUser().getDistrict());
-				dto.setDistrictCode(user.getContactUser().getDistrictCode());
-				dto.setSubDistrict(user.getContactUser().getSubDistrict());
-				dto.setSubDistrictCode(user.getContactUser().getSubDistrictCode());
-				dto.setZipcode(user.getContactUser().getZipcode());	
-				dto.setPhoneNumber(user.getContactUser().getPhoneNumber());
-				dto.setDescription(user.getContactUser().getDescription());
-			}
-			dto.setImage(user.getImage());
-			return dto;
 		} else
 			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
 	}
@@ -141,5 +93,128 @@ public class ProfileImplService {
 		} else
 			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
 	}
+	
+	@Transactional
+	private ProfileDto getProfile(String p_username, String p_locale) throws Exception {
+		if (p_username != null) {
+			ProfileDto dto = new ProfileDto();
+			UserEntity user = this.userRepo.loadByUsername(p_username);
+			dto.setUsername(p_username);
+			dto.setName(user.getName());
+			dto.setEmail(user.getEmail());
+			dto.setImage(user.getImage());
+			dto.setContact(this.getContact(p_username, p_locale));
+			dto.setPersonalInfo(this.getPersonalInfo(p_username, p_locale));
+			return dto;
+		} else
+			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
+	}
+
+	public ProfileDto getProfile(Authentication authentication, String p_locale) throws Exception {
+		UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
+		if (user.getUsername() != null) {
+			return getProfile(user.getUsername(), p_locale);
+		} else
+			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
+	}
+	
+	private ContactUserDto getContact(String p_username, String p_locale) {
+		ContactUserEntity contactUser = this.contactUserRepo.findByUser_Username(p_username); 
+		ContactUserDto contactUserDto = null;
+		if(contactUser != null) {
+			contactUserDto = new ContactUserDto();
+			contactUserDto.setAddress(contactUser.getAddress());
+			contactUserDto.setCountry(contactUser.getCountry());
+			contactUserDto.setCountryCode(contactUser.getCountryCode());
+			contactUserDto.setProvince(contactUser.getProvince());
+			contactUserDto.setProvinceCode(contactUser.getProvinceCode());
+			contactUserDto.setCity(contactUser.getCity());
+			contactUserDto.setCityCode(contactUser.getCityCode());
+			contactUserDto.setDistrict(contactUser.getDistrict());
+			contactUserDto.setDistrictCode(contactUser.getDistrictCode());
+			contactUserDto.setSubDistrict(contactUser.getSubDistrict());
+			contactUserDto.setSubDistrictCode(contactUser.getSubDistrictCode());
+			contactUserDto.setZipcode(contactUser.getZipcode());	
+			contactUserDto.setPhoneNumber(contactUser.getPhoneNumber());
+		}
+		return contactUserDto;
+	}
+	
+	private void updateContact(ProfileDto p_dto, UserEntity user) throws Exception {
+		ContactUserEntity contactUser = this.contactUserRepo.findByUser_Username(user.getUsername()); 
+		if (contactUser == null) {
+			contactUser = new ContactUserEntity();
+		}
+		if (p_dto.getContact().getAddress() == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0405);
+		}
+		if (p_dto.getContact().getPhoneNumber() != null) {
+			if (p_dto.getContact().getPhoneNumber().matches(PatternGlobal.PHONE_NUMBER.getRegex())) {
+				contactUser.setPhoneNumber(p_dto.getContact().getPhoneNumber());	
+			} else
+				throw new SystemErrorException(ErrorCode.ERR_SCR0007A);
+		} else
+			throw new SystemErrorException(ErrorCode.ERR_SYS0405);
+		contactUser.setAddress(p_dto.getContact().getAddress());
+		contactUser.setCountry(p_dto.getContact().getCountry());
+		contactUser.setCountryCode(p_dto.getContact().getCountryCode());
+		contactUser.setProvince(p_dto.getContact().getProvince());
+		contactUser.setProvinceCode(p_dto.getContact().getProvinceCode());
+		contactUser.setCity(p_dto.getContact().getCity());
+		contactUser.setCityCode(p_dto.getContact().getCityCode());
+		contactUser.setDistrict(p_dto.getContact().getDistrict());
+		contactUser.setDistrictCode(p_dto.getContact().getDistrictCode());
+		contactUser.setSubDistrict(p_dto.getContact().getSubDistrict());
+		contactUser.setSubDistrictCode(p_dto.getContact().getSubDistrictCode());
+		contactUser.setZipcode(p_dto.getContact().getZipcode());
+		contactUser.setUser(user);
+		this.contactUserRepo.save(contactUser);
+	}
+	
+	private PersonalInfoDto getPersonalInfo(String p_username, String p_locale) {
+		PersonalInfoEntity personalInfo = this.personalInfoRepo.findByUser_Username(p_username);
+		PersonalInfoDto personalInfoDto = null;
+		if(personalInfo != null) {
+			personalInfoDto = new PersonalInfoDto();
+			personalInfoDto.setIdNumber(personalInfo.getId());
+			personalInfoDto.setPlaceOfBirth(personalInfo.getPlaceOfBirth());	
+			personalInfoDto.setDateOfBirth(DateUtil.DATE.format(personalInfo.getDateOfBirth()));
+			personalInfoDto.setAge(this.calculateAge(personalInfo.getDateOfBirth(), new Date()));
+			personalInfoDto.setGenderCode(personalInfo.getGender());
+			try {
+				ParameterI18nEntity parameterI18n = parameterI18nRepo.findByParameter_ParameterCodeAndLocaleCode(personalInfo.getGender(), p_locale);
+				personalInfoDto.setGenderValue(parameterI18n.getParameterValue());
+			} catch (Exception e) {}
+		}
+		return personalInfoDto;
+	}
+	
+	private void updatePersonalInfo(ProfileDto p_dto, UserEntity user) throws Exception {
+		PersonalInfoEntity personalInfo = this.personalInfoRepo.findByUser_Username(user.getUsername()); 
+		if (personalInfo == null) {
+			personalInfo = new PersonalInfoEntity();
+		}
+		if (p_dto.getPersonalInfo().getIdNumber() == null ||
+				p_dto.getPersonalInfo().getGenderCode() == null ||
+				p_dto.getPersonalInfo().getPlaceOfBirth() == null ||
+				p_dto.getPersonalInfo().getDateOfBirth() == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0405);
+		}
+		personalInfo.setIdNumber(p_dto.getPersonalInfo().getIdNumber());
+		personalInfo.setGender(p_dto.getPersonalInfo().getGenderCode());
+		personalInfo.setPlaceOfBirth(p_dto.getPersonalInfo().getPlaceOfBirth());
+		personalInfo.setDateOfBirth(DateUtil.DATE.parse(p_dto.getPersonalInfo().getDateOfBirth()));
+		personalInfo.setHeight(p_dto.getPersonalInfo().getHeight());
+		personalInfo.setWeight(p_dto.getPersonalInfo().getWeight());
+		personalInfo.setUser(user);
+		this.personalInfoRepo.save(personalInfo);
+	}
+
+    private int calculateAge(Date birthDate, Date currentDate) {                                                                              
+        DateFormat formatter = new SimpleDateFormat(DateUtil.DEFAULT_FORMAT_DATE);                           
+        int birthFormat = Integer.parseInt(formatter.format(birthDate));                            
+        int currentFormat = Integer.parseInt(formatter.format(currentDate));                          
+        return (currentFormat - birthFormat) / 10000;
+    }
 
 }

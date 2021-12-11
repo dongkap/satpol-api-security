@@ -35,7 +35,6 @@ import com.dongkap.security.dao.RoleRepo;
 import com.dongkap.security.dao.UserRepo;
 import com.dongkap.security.dao.specification.UserSpecification;
 import com.dongkap.security.entity.AppEntity;
-import com.dongkap.security.entity.ContactUserEntity;
 import com.dongkap.security.entity.RoleEntity;
 import com.dongkap.security.entity.SettingsEntity;
 import com.dongkap.security.entity.UserEntity;
@@ -93,20 +92,7 @@ public class UserImplService extends CommonService {
 			temp.setCreatedDate(value.getCreatedDate());
 			temp.setCreatedBy(value.getCreatedBy());
 			temp.setModifiedDate(value.getModifiedDate());
-			temp.setModifiedBy(value.getModifiedBy());	
-			if(value.getContactUser() != null) {
-				temp.setName(value.getFullname());
-				temp.setPhoneNumber(value.getContactUser().getPhoneNumber());
-				temp.setAddress(value.getContactUser().getAddress());
-				temp.setCountry(value.getContactUser().getCountry());
-				temp.setProvince(value.getContactUser().getProvince());
-				temp.setCity(value.getContactUser().getCity());
-				temp.setDistrict(value.getContactUser().getDistrict());
-				temp.setSubDistrict(value.getContactUser().getSubDistrict());
-				temp.setZipcode(value.getContactUser().getZipcode());
-				temp.setImage(value.getImage());
-				temp.setDescription(value.getContactUser().getDescription());
-			}
+			temp.setModifiedBy(value.getModifiedBy());
 			response.getData().add(temp);
 		});
 		return response;
@@ -144,9 +130,6 @@ public class UserImplService extends CommonService {
 			RoleEntity role = this.roleRepo.findByAuthority(ROLE_END);
 			user.getRoles().add(role);
 			user.setAuthorityDefault(ROLE_END);
-			ContactUserEntity contactUser = new ContactUserEntity();
-			contactUser.setUser(user);
-			user.setContactUser(contactUser);
 			SettingsEntity settings = new SettingsEntity();
 			settings.setUser(user);
 			user.setSettings(settings);

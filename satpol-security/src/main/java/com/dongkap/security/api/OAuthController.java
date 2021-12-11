@@ -14,7 +14,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.endpoint.TokenEndpoint;
-import org.springframework.security.oauth2.provider.token.ConsumerTokenServices;
+import org.springframework.security.oauth2.provider.token.DefaultTokenServices;
+import org.springframework.security.oauth2.provider.token.ResourceServerTokenServices;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -44,7 +45,10 @@ public class OAuthController extends BaseControllerException {
 	private TokenStore tokenStore;
 
 	@Autowired
-	private ConsumerTokenServices tokenServices;
+	private DefaultTokenServices tokenServices;
+	
+	@Autowired
+	private ResourceServerTokenServices resourceServerTokenServices;
 
 	@Value("#{new Boolean('${dongkap.login.single-session}')}")
 	private boolean isSingleSession;
@@ -55,34 +59,33 @@ public class OAuthController extends BaseControllerException {
 	public ResponseEntity<OAuth2AccessToken> oauthToken(Principal principal,
 														@RequestParam Map<String, String> parameters) throws Exception {
 		if(!isRefreshTokenRequest(parameters)) {
-			this.isSessionActive = tokenStore
-					.findTokensByClientIdAndUserName(parameters.get("client_id"), parameters.get("username"))
-					.stream().anyMatch(token->!token.isExpired());
+			this.tokenStore.findTokensByClientIdAndUserName(parameters.get("client_id"), parameters.get("username"))
+			.stream().filter(predicate->!predicate.isExpired()).forEach(oauth2AccessToken->{
+				OAuth2AccessToken token = this.resourceServerTokenServices.readAccessToken(oauth2AccessToken.getValue());
+				if(token != null) {
+					this.isSessionActive = true;
+				}
+			});
 		}
-		ResponseEntity<OAuth2AccessToken> response = this.tokenEndpoint.postAccessToken(principal, parameters);
 
 		if(this.isSessionActive && this.isSingleSession) {
+			this.isSessionActive = false;
 			throw new SystemErrorException(ErrorCode.ERR_SCR0000);
 		} else {
-			return response;
+			return this.tokenEndpoint.postAccessToken(principal, parameters);
 		}
 	}
 
 	@RequestMapping(value = "/oauth/force", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<OAuth2AccessToken> forceToken(Principal principal,
 														@RequestParam Map<String, String> parameters) throws Exception {
-		ResponseEntity<OAuth2AccessToken> response = this.tokenEndpoint.postAccessToken(principal, parameters);
-		if(response != null) {
-			OAuth2AccessToken token = response.getBody();
-			if(token != null) {
-				tokenServices.revokeToken(token.getValue());
-				return this.tokenEndpoint.postAccessToken(principal, parameters);
-			} else {
-				throw new SystemErrorException(ErrorCode.ERR_SYS0500);
-			}
-		} else {
-			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
-		}
+		this.tokenStore.findTokensByClientIdAndUserName(parameters.get("client_id"), parameters.get("username"))
+		.stream().filter(predicate->!predicate.isExpired()).forEach(oauth2AccessToken->{
+			tokenServices.revokeToken(oauth2AccessToken.getValue());
+			tokenStore.removeAccessToken(oauth2AccessToken);
+			tokenStore.removeRefreshToken(oauth2AccessToken.getRefreshToken());
+		});
+		return this.tokenEndpoint.postAccessToken(principal, parameters);
 	}
 
 	@RequestMapping(value = "/oauth/check-user", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

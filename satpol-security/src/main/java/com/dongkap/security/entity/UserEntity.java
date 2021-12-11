@@ -42,8 +42,8 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper=false, exclude={"apps", "roles", "contactUser", "settings"})
-@ToString(exclude={"apps", "roles", "contactUser", "settings"})
+@EqualsAndHashCode(callSuper=false, exclude={"apps", "roles", "settings"})
+@ToString(exclude={"apps", "roles", "settings"})
 @Entity
 @Table(name = "sec_user", schema = SchemaDatabase.SECURITY)
 public class UserEntity extends BaseAuditEntity implements UserDetails, OAuth2User {
@@ -149,9 +149,6 @@ public class UserEntity extends BaseAuditEntity implements UserDetails, OAuth2Us
     public Map<String, Object> getAttributes() {
         return this.attributes;
     }
-	
-	@OneToOne(mappedBy = "user", targetEntity = ContactUserEntity.class, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
-	private ContactUserEntity contactUser;
 	
 	@OneToOne(mappedBy = "user", targetEntity = SettingsEntity.class, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
 	private SettingsEntity settings;
