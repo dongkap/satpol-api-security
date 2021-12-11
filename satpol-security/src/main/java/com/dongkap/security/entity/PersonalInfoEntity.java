@@ -54,10 +54,10 @@ public class PersonalInfoEntity extends BaseAuditEntity {
 	private Date dateOfBirth;
 	
 	@Column(name = "height", nullable = true)
-	private double height;
+	private Double height;
 	
 	@Column(name = "weight", nullable = true)
-	private double weight;
+	private Double weight;
 
 	@OneToOne(targetEntity = UserEntity.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_uuid", nullable = false, updatable = false)

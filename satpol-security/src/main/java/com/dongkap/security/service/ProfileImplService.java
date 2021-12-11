@@ -1,7 +1,7 @@
 package com.dongkap.security.service;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.Date;
 import java.util.Map;
 
@@ -176,7 +176,7 @@ public class ProfileImplService {
 		PersonalInfoDto personalInfoDto = null;
 		if(personalInfo != null) {
 			personalInfoDto = new PersonalInfoDto();
-			personalInfoDto.setIdNumber(personalInfo.getId());
+			personalInfoDto.setIdNumber(personalInfo.getIdNumber());
 			personalInfoDto.setPlaceOfBirth(personalInfo.getPlaceOfBirth());	
 			personalInfoDto.setDateOfBirth(DateUtil.DATE.format(personalInfo.getDateOfBirth()));
 			personalInfoDto.setAge(this.calculateAge(personalInfo.getDateOfBirth(), new Date()));
@@ -210,11 +210,12 @@ public class ProfileImplService {
 		this.personalInfoRepo.save(personalInfo);
 	}
 
-    private int calculateAge(Date birthDate, Date currentDate) {                                                                              
-        DateFormat formatter = new SimpleDateFormat(DateUtil.DEFAULT_FORMAT_DATE);                           
-        int birthFormat = Integer.parseInt(formatter.format(birthDate));                            
-        int currentFormat = Integer.parseInt(formatter.format(currentDate));                          
-        return (currentFormat - birthFormat) / 10000;
+    private int calculateAge(Date birthDate, Date currentDate) {
+    	return Period.between(toLocalDate(birthDate), toLocalDate(currentDate)).getYears();
+    }
+
+    public LocalDate toLocalDate(Date dateToConvert) {
+        return new java.sql.Date(dateToConvert.getTime()).toLocalDate();
     }
 
 }
