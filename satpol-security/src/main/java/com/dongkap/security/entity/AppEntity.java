@@ -1,18 +1,11 @@
 package com.dongkap.security.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.dongkap.common.utils.SchemaDatabase;
@@ -26,8 +19,8 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper=false, exclude={"users"})
-@ToString(exclude={"users"})
+@EqualsAndHashCode(callSuper=false)
+@ToString
 @Entity
 @Table(name = "sec_app", schema = SchemaDatabase.SECURITY)
 public class AppEntity extends BaseAuditEntity {
@@ -49,11 +42,7 @@ public class AppEntity extends BaseAuditEntity {
 	@Column(name = "app_name", nullable = false)
 	private String appName;
 
-	@Column(name = "description", nullable = false)
+	@Column(name = "description")
 	private String description;
-
-	@ManyToMany(mappedBy = "apps", targetEntity = UserEntity.class, fetch = FetchType.LAZY)
-	@Fetch(FetchMode.SELECT)
-	private Set<UserEntity> users = new HashSet<UserEntity>();
 
 }

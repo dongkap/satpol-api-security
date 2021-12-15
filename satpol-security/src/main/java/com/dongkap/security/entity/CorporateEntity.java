@@ -1,18 +1,11 @@
 package com.dongkap.security.entity;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.dongkap.common.utils.SchemaDatabase;
@@ -26,8 +19,8 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper=false, exclude={"employees", "occupations"})
-@ToString(exclude={"employees", "occupations"})
+@EqualsAndHashCode(callSuper=false)
+@ToString
 @Entity
 @Table(name = "sec_corporate", schema = SchemaDatabase.SECURITY)
 public class CorporateEntity extends BaseAuditEntity {
@@ -63,13 +56,5 @@ public class CorporateEntity extends BaseAuditEntity {
 
 	@Column(name = "fax_number")
 	private String faxNumber;
-
-	@ManyToMany(mappedBy = "corporate", targetEntity = EmployeeEntity.class, fetch = FetchType.LAZY)
-	@Fetch(FetchMode.SELECT)
-	private Set<EmployeeEntity> employees = new HashSet<EmployeeEntity>();
-
-	@ManyToMany(mappedBy = "corporate", targetEntity = OccupationEntity.class, fetch = FetchType.LAZY)
-	@Fetch(FetchMode.SELECT)
-	private Set<OccupationEntity> occupations = new HashSet<OccupationEntity>();
 
 }
