@@ -17,10 +17,16 @@ dongkap:
 
 spring:
   redis:
+    client-name: ${REDIS_CLIENT_NAME:satpol-activity}
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PASSWORD:P@ssw0rd}
     database: ${REDIS_DATABASE:1}
+    pool:
+      min-idle: 0
+      max-idle: 8
+      max-active: 8
+      max-wait: -1
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:satpol}

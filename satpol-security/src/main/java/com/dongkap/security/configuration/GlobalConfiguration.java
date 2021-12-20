@@ -1,9 +1,7 @@
 package com.dongkap.security.configuration;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,8 +11,6 @@ import org.springframework.security.oauth2.provider.error.DefaultWebResponseExce
 import org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler;
 import org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint;
 import org.springframework.security.oauth2.provider.error.WebResponseExceptionTranslator;
-import org.springframework.security.oauth2.provider.token.TokenStore;
-import org.springframework.security.oauth2.provider.token.store.redis.RedisTokenStore;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
@@ -22,9 +18,6 @@ import com.dongkap.common.exceptions.CustomOauthException;
 
 @Configuration
 public class GlobalConfiguration {
-	
-    @Autowired
-    private RedisConnectionFactory redisConnectionFactory;
     
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
@@ -59,12 +52,6 @@ public class GlobalConfiguration {
 	@Bean(name = "passwordEncoder")
     public PasswordEncoder passwordEncoder() {
     	return new BCryptPasswordEncoder(13);
-    }
-    
-    @Bean
-    public TokenStore tokenStore() {
-        // return new JdbcOauth2TokenStore(dataSource);
-        return new RedisTokenStore(redisConnectionFactory);
     }
 	
 }
