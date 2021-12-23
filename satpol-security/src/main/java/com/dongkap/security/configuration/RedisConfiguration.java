@@ -37,8 +37,8 @@ public class RedisConfiguration {
 	
 	@Bean
 	@ConditionalOnMissingBean(name = "redisTemplate")
-	public RedisTemplate<Object, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) throws UnknownHostException {
-		RedisTemplate<Object, Object> template = new RedisTemplate<>();
+	public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory redisConnectionFactory) throws UnknownHostException {
+		RedisTemplate<String, Object> template = new RedisTemplate<>();
 		template.setConnectionFactory(redisConnectionFactory);
 		return template;
 	}

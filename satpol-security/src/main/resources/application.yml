@@ -17,11 +17,13 @@ dongkap:
 
 spring:
   redis:
-    client-name: ${REDIS_CLIENT_NAME:satpol-activity}
+    client-name: ${REDIS_CLIENT_NAME:satpol-security}
     host: ${REDIS_HOST:localhost}
     port: ${REDIS_PORT:6379}
     password: ${REDIS_PASSWORD:P@ssw0rd}
     database: ${REDIS_DATABASE:1}
+    connect-timeout: 2s
+    timeout: 3s
     pool:
       min-idle: 0
       max-idle: 8
@@ -80,13 +82,6 @@ security:
       jwt:
         key-value: CfZKBe7IZHxBCgH9Dz49
       prefer-token-info: true
-
-async-thread-pool:
-  corePoolSize: 20
-  maximumPoolSize: 1000
-  keepAliveTime: 30
-  queueCapacity: 200
-  threadPrefix: DONGKAP_EXEC-
 
 ribbon:
   eureka:
