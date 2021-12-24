@@ -1,5 +1,6 @@
 package com.dongkap.security.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -12,7 +13,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.dongkap.common.exceptions.SystemErrorException;
+import com.dongkap.common.stream.PublishStream;
 import com.dongkap.common.utils.ErrorCode;
+import com.dongkap.common.utils.ParameterStatic;
+import com.dongkap.common.utils.StreamKeyStatic;
 import com.dongkap.dto.common.CommonResponseDto;
 import com.dongkap.dto.common.FilterDto;
 import com.dongkap.dto.security.CorporateDto;
@@ -70,10 +74,16 @@ public class CorporateImplService extends CommonService {
 	}
 	
 	@Transactional
-	public void postCorporate(CorporateDto request, String username) throws Exception {
+	@PublishStream(key = StreamKeyStatic.CORPORATE, status = ParameterStatic.UPDATE_DATA)
+	public List<CorporateDto> postCorporate(CorporateDto request, String username) throws Exception {
 		CorporateEntity corporate = this.corporateRepo.findByCorporateCode(request.getCorporateCode());
+		List<CorporateDto> result = null;
 		if (corporate == null) {
 			corporate = new CorporateEntity();
+		} else {
+			request.setId(corporate.getId());
+			result = new ArrayList<CorporateDto>();
+			result.add(request);
 		}
 		corporate.setCorporateCode(request.getCorporateCode());
 		corporate.setCorporateName(request.getCorporateName());
@@ -83,6 +93,7 @@ public class CorporateImplService extends CommonService {
 		corporate.setTelpNumber(request.getTelpNumber());
 		corporate.setFaxNumber(request.getFaxNumber());
 		corporateRepo.saveAndFlush(corporate);
+		return result;
 	}
 
 	public void deleteCorporates(List<String> corporateCodes) throws Exception {

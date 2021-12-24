@@ -7,11 +7,11 @@ import org.springframework.data.redis.connection.stream.RecordId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.dongkap.common.stream.CommonStreamListener;
 import com.dongkap.common.utils.ParameterStatic;
 import com.dongkap.common.utils.StreamKeyStatic;
 import com.dongkap.dto.common.CommonStreamMessageDto;
 import com.dongkap.dto.master.ParameterI18nDto;
-import com.dongkap.security.common.CommonStreamListener;
 import com.dongkap.security.dao.ParameterI18nRepo;
 import com.dongkap.security.entity.ParameterI18nEntity;
 
@@ -38,16 +38,16 @@ public class ParameterListenerService extends CommonStreamListener<CommonStreamM
 		LOGGER.info("A message was received stream: [{}], id: [{}]", stream, id);
         CommonStreamMessageDto value = message.getValue();
         if(value != null) {
-	        value.getDatas().forEach(data->{
+        	for(Object data: value.getDatas()) {
 	        	if(data instanceof ParameterI18nDto) {
 	        		ParameterI18nDto param = (ParameterI18nDto)data;
 	        		ParameterI18nEntity parameterI18n = parameterI18nRepo.findById(param.getParameterI18nUUID()).orElse(null);
-	        		if(parameterI18n != null && value.getStatus() == ParameterStatic.UPDATE_DATA) {
+	        		if(parameterI18n != null && value.getStatus().equalsIgnoreCase(ParameterStatic.UPDATE_DATA)) {
 		        		parameterI18n.setParameterValue(param.getParameterValue());
 		        		parameterI18nRepo.save(parameterI18n);
 	        		}
 	        	}
-	        });
+	        }
         }
 	}
 }
