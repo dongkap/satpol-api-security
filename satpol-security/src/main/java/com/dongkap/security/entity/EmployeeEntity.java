@@ -12,7 +12,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.Fetch;
@@ -30,8 +29,8 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper=false, exclude={"user", "corporate", "occupation", "fileMetadata", "parentEmployee", "childEmployees"})
-@ToString(exclude={"user", "corporate", "occupation", "fileMetadata", "parentEmployee", "childEmployees"})
+@EqualsAndHashCode(callSuper=false, exclude={"user", "corporate", "occupation", "parentEmployee", "childEmployees"})
+@ToString(exclude={"user", "corporate", "occupation", "parentEmployee", "childEmployees"})
 @Entity
 @Table(name = "sec_employee", schema = SchemaDatabase.SECURITY)
 public class EmployeeEntity extends BaseAuditEntity {
@@ -65,10 +64,6 @@ public class EmployeeEntity extends BaseAuditEntity {
 	@JoinColumn(name = "occupation_uuid", nullable = false)
 	private OccupationEntity occupation;
 
-	@OneToOne(targetEntity = FileMetadataEntity.class, fetch = FetchType.LAZY)
-	@JoinColumn(name = "file_metadata_uuid", nullable = true, updatable = false)
-	private FileMetadataEntity fileMetadata;
-
 	@ManyToOne(targetEntity = EmployeeEntity.class, fetch = FetchType.LAZY)
 	@Fetch(FetchMode.SELECT)
 	@JoinColumn(name = "parent_uuid", nullable = true, insertable = false, updatable = false)
@@ -76,7 +71,6 @@ public class EmployeeEntity extends BaseAuditEntity {
 
 	@OneToMany(mappedBy = "parentEmployee", fetch = FetchType.EAGER)
 	@Fetch(FetchMode.JOIN)
-	@OrderBy("orderingStr ASC")
 	private Set<EmployeeEntity> childEmployees = new HashSet<EmployeeEntity>();
 
 }

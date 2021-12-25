@@ -9,15 +9,15 @@ import javax.persistence.criteria.Root;
 
 import org.springframework.data.jpa.domain.Specification;
 
-import com.dongkap.security.entity.CorporateEntity;
+import com.dongkap.security.entity.OccupationEntity;
 
 
-public class CorporateSpecification {
+public class OccupationSpecification {
 	
 	private static final String IS_ACTIVE = "active";
 
-	public static Specification<CorporateEntity> getSelect(final Map<String, Object> keyword) {
-		return new Specification<CorporateEntity>() {
+	public static Specification<OccupationEntity> getSelect(final Map<String, Object> keyword) {
+		return new Specification<OccupationEntity>() {
 
 			/**
 			 * 
@@ -25,7 +25,7 @@ public class CorporateSpecification {
 			private static final long serialVersionUID = -637621292944403277L;
 
 			@Override
-			public Predicate toPredicate(Root<CorporateEntity> root, CriteriaQuery<?> criteria, CriteriaBuilder builder) {
+			public Predicate toPredicate(Root<OccupationEntity> root, CriteriaQuery<?> criteria, CriteriaBuilder builder) {
 				Predicate predicate = builder.conjunction();
 				if (!keyword.isEmpty()) {
 					for(Map.Entry<String, Object> filter : keyword.entrySet()) {
@@ -34,12 +34,15 @@ public class CorporateSpecification {
 						if (value != null) {
 							switch (key) {
 								case "_label" :
-								case "corporateName" :
+								case "name" :
 									// builder.upper for PostgreSQL
-									predicate.getExpressions().add(builder.like(builder.upper(root.<String>get("corporateName")), String.format("%%%s%%", value.toString().toUpperCase())));
+									predicate.getExpressions().add(builder.like(builder.upper(root.<String>get("name")), String.format("%%%s%%", value.toString().toUpperCase())));
+									break;
+								case "code" :
+									predicate.getExpressions().add(builder.equal(root.get(key), value));
 									break;
 								case "corporateCode" :
-									predicate.getExpressions().add(builder.equal(root.get("corporateCode"), value));
+									predicate.getExpressions().add(builder.equal(root.join("corporate").<String>get("corporateCode"), value.toString()));
 									break;
 							}
 						}
@@ -51,8 +54,8 @@ public class CorporateSpecification {
 		};
 	}
 
-	public static Specification<CorporateEntity> getDatatable(final Map<String, Object> keyword) {
-		return new Specification<CorporateEntity>() {
+	public static Specification<OccupationEntity> getDatatable(final Map<String, Object> keyword) {
+		return new Specification<OccupationEntity>() {
 
 			/**
 			 * 
@@ -60,7 +63,7 @@ public class CorporateSpecification {
 			private static final long serialVersionUID = -637621292944403277L;
 
 			@Override
-			public Predicate toPredicate(Root<CorporateEntity> root, CriteriaQuery<?> criteria, CriteriaBuilder builder) {
+			public Predicate toPredicate(Root<OccupationEntity> root, CriteriaQuery<?> criteria, CriteriaBuilder builder) {
 				Predicate predicate = builder.conjunction();
 				if (!keyword.isEmpty()) {
 					for(Map.Entry<String, Object> filter : keyword.entrySet()) {
@@ -68,14 +71,17 @@ public class CorporateSpecification {
 						Object value = filter.getValue();
 						if (value != null) {
 							switch (key) {
-								case "corporateCode" :
-									predicate.getExpressions().add(builder.equal(root.get("corporateCode"), value));
-								case "corporateName" :
+								case "code" :
+									predicate.getExpressions().add(builder.equal(root.get(key), value));
+								case "name" :
 									// builder.upper for PostgreSQL
-									predicate.getExpressions().add(builder.like(builder.upper(root.<String>get("corporateName")), String.format("%%%s%%", value.toString().toUpperCase())));
+									predicate.getExpressions().add(builder.like(builder.upper(root.<String>get(key)), String.format("%%%s%%", value.toString().toUpperCase())));
+									break;
+								case "corporateCode" :
+									predicate.getExpressions().add(builder.equal(root.join("corporate").<String>get("corporateCode"), value.toString()));
 									break;
 								case "_all" :
-									predicate.getExpressions().add(builder.like(builder.upper(root.<String>get("corporateName")), String.format("%%%s%%", value.toString().toUpperCase())));
+									predicate.getExpressions().add(builder.like(builder.upper(root.<String>get("name")), String.format("%%%s%%", value.toString().toUpperCase())));
 									break;
 								default :
 									break;

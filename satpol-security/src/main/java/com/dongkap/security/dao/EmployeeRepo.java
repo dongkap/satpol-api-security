@@ -6,5 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.dongkap.security.entity.EmployeeEntity;
 
 public interface EmployeeRepo extends JpaRepository<EmployeeEntity, String>, JpaSpecificationExecutor<EmployeeEntity> {
+
+	EmployeeEntity findByUser_Username(String username);
 	
 }
