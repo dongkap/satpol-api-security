@@ -15,22 +15,27 @@ import org.springframework.security.oauth2.common.OAuth2AccessToken;
 import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.security.oauth2.provider.token.TokenEnhancer;
 
+import com.dongkap.common.exceptions.SystemErrorException;
 import com.dongkap.common.security.UserPrincipal;
 import com.dongkap.common.utils.DateUtil;
 import com.dongkap.common.utils.JsonUtils;
+import com.dongkap.common.utils.ParameterStatic;
+import com.dongkap.dto.security.CorporateDto;
 import com.dongkap.dto.security.MenuDto;
+import com.dongkap.security.service.EmployeeImplService;
 import com.dongkap.security.service.MenuImplService;
 
 public class SecurityTokenEnhancer implements TokenEnhancer {
 
     protected Logger LOGGER = LoggerFactory.getLogger(this.getClass());
 	
-	@Value("${dongkap.client-id.web}")
-	private String clientIdWeb;
-	
 	@Autowired
 	@Qualifier("menuService")
 	private MenuImplService menuService;
+	
+	@Autowired
+	@Qualifier("employeeService")
+	private EmployeeImplService employeeService;
 	
 	@Value("${dongkap.signature.public-key}")
 	private String publicKey;
@@ -42,8 +47,9 @@ public class SecurityTokenEnhancer implements TokenEnhancer {
 	public OAuth2AccessToken enhance(OAuth2AccessToken accessToken, OAuth2Authentication authentication) {
 		if (authentication.getPrincipal() instanceof UserPrincipal) {
 			UserPrincipal user = (UserPrincipal) authentication.getPrincipal();
-	        Map<String, Object> additionalInfo = new TreeMap<String, Object>();	
-			if(authentication.getOAuth2Request().getClientId().equals(clientIdWeb) && user.getRaw() == null) {
+			Map<String, String> parameters = authentication.getOAuth2Request().getRequestParameters();
+	        Map<String, Object> additionalInfo = new TreeMap<String, Object>();
+			if(ParameterStatic.PLATFORM_WEB.equalsIgnoreCase(parameters.get("platform")) && user.getRaw() == null) {
 				try {
 					Map<String, List<MenuDto>> allMenus = menuService.loadAllMenuByRole(user.getAuthorityDefault(), (user.getAttributes().get("locale") == null)? "en-US" : user.getAttributes().get("locale").toString());
 					String menuString = jsonUtils.objToJson(allMenus.get("main"));
@@ -55,6 +61,13 @@ public class SecurityTokenEnhancer implements TokenEnhancer {
 				} catch (Exception e) {
 					LOGGER.error(e.getMessage(), e);
 				}
+			}
+			try {
+				CorporateDto corporate = this.employeeService.getCorporate(user.getUsername());
+				additionalInfo.put("corporate_code", corporate.getCorporateCode());
+			} catch (SystemErrorException e) {
+			} catch (Exception e) {
+				LOGGER.error(e.getMessage(), e);
 			}
 	        additionalInfo.put("username", user.getUsername());
 	        additionalInfo.put("authority", user.getAuthorityDefault());

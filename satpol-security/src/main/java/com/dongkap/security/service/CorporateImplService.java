@@ -36,7 +36,7 @@ public class CorporateImplService extends CommonService {
 	private CorporateRepo corporateRepo;
 
 	@Transactional
-	public SelectResponseDto getSelectCorporate(FilterDto filter) throws Exception {
+	public SelectResponseDto getSelect(FilterDto filter) throws Exception {
 		Page<CorporateEntity> corporate = corporateRepo.findAll(CorporateSpecification.getSelect(filter.getKeyword()), page(filter.getOrder(), filter.getOffset(), filter.getLimit()));
 		final SelectResponseDto response = new SelectResponseDto();
 		response.setTotalFiltered(Long.valueOf(corporate.getContent().size()));

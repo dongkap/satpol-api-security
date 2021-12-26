@@ -16,9 +16,6 @@ import com.dongkap.common.utils.DateUtil;
 @Configuration
 public class JwtTokenConfiguration {
 	
-	@Value("${dongkap.client-id.web}")
-	private String clientIdWeb;
-	
     @Value("${security.oauth2.resource.jwt.key-value}")
     private String jwtKey;
 	

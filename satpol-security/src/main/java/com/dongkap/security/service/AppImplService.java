@@ -23,7 +23,7 @@ import com.dongkap.security.dao.AppRepo;
 import com.dongkap.security.dao.specification.AppSpecification;
 import com.dongkap.security.entity.AppEntity;
 
-@Service("AppService")
+@Service("appService")
 public class AppImplService extends CommonService {
 
 	protected Logger LOGGER = LoggerFactory.getLogger(this.getClass());
@@ -32,7 +32,7 @@ public class AppImplService extends CommonService {
 	private AppRepo appRepo;
 
 	@Transactional
-	public SelectResponseDto getSelectApp(FilterDto filter) throws Exception {
+	public SelectResponseDto getSelect(FilterDto filter) throws Exception {
 		Page<AppEntity> app = this.appRepo.findAll(AppSpecification.getSelect(filter.getKeyword()), page(filter.getOrder(), filter.getOffset(), filter.getLimit()));
 		final SelectResponseDto response = new SelectResponseDto();
 		response.setTotalFiltered(Long.valueOf(app.getContent().size()));

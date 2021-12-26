@@ -2,6 +2,7 @@ package com.dongkap.security.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
@@ -23,10 +24,10 @@ import com.dongkap.dto.security.OccupationDto;
 import com.dongkap.dto.select.SelectDto;
 import com.dongkap.dto.select.SelectResponseDto;
 import com.dongkap.security.common.CommonService;
-import com.dongkap.security.dao.EmployeeRepo;
+import com.dongkap.security.dao.CorporateRepo;
 import com.dongkap.security.dao.OccupationRepo;
 import com.dongkap.security.dao.specification.OccupationSpecification;
-import com.dongkap.security.entity.EmployeeEntity;
+import com.dongkap.security.entity.CorporateEntity;
 import com.dongkap.security.entity.OccupationEntity;
 
 @Service("occupationService")
@@ -38,12 +39,14 @@ public class OccupationImplService extends CommonService {
 	private OccupationRepo occupationRepo;
 
 	@Autowired
-	private EmployeeRepo employeeRepo;
+	private CorporateRepo corporateRepo;
 
 	@Transactional
-	public SelectResponseDto getSelectOccupation(String username, FilterDto filter) throws Exception {
-		EmployeeEntity employee = employeeRepo.findByUser_Username(username);
-		filter.getKeyword().put("corporateCode", employee.getCorporate().getCorporateCode());
+	public SelectResponseDto getSelect(Map<String, Object> additionalInfo, FilterDto filter) throws Exception {
+		if(additionalInfo.get("corporate_code") == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
+		filter.getKeyword().put("corporateCode", additionalInfo.get("corporate_code"));
 		Page<OccupationEntity> occupation = occupationRepo.findAll(OccupationSpecification.getSelect(filter.getKeyword()), page(filter.getOrder(), filter.getOffset(), filter.getLimit()));
 		final SelectResponseDto response = new SelectResponseDto();
 		response.setTotalFiltered(Long.valueOf(occupation.getContent().size()));
@@ -55,9 +58,11 @@ public class OccupationImplService extends CommonService {
 	}
 
 	@Transactional
-	public CommonResponseDto<OccupationDto> getDatatable(String username, FilterDto filter) throws Exception {
-		EmployeeEntity employee = employeeRepo.findByUser_Username(username);
-		filter.getKeyword().put("corporateCode", employee.getCorporate().getCorporateCode());
+	public CommonResponseDto<OccupationDto> getDatatable(Map<String, Object> additionalInfo, FilterDto filter) throws Exception {
+		if(additionalInfo.get("corporate_code") == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
+		filter.getKeyword().put("corporateCode", additionalInfo.get("corporate_code"));
 		Page<OccupationEntity> occupation = occupationRepo.findAll(OccupationSpecification.getDatatable(filter.getKeyword()), page(filter.getOrder(), filter.getOffset(), filter.getLimit()));
 		final CommonResponseDto<OccupationDto> response = new CommonResponseDto<OccupationDto>();
 		response.setTotalFiltered(Long.valueOf(occupation.getContent().size()));
@@ -81,13 +86,19 @@ public class OccupationImplService extends CommonService {
 	
 	@Transactional
 	@PublishStream(key = StreamKeyStatic.OCCUPATION, status = ParameterStatic.UPDATE_DATA)
-	public List<OccupationDto> postOccupation(OccupationDto request, String username) throws Exception {
-		EmployeeEntity employee = employeeRepo.findByUser_Username(username);
+	public List<OccupationDto> postOccupation(Map<String, Object> additionalInfo, OccupationDto request) throws Exception {
+		if(additionalInfo.get("corporate_code") == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
 		OccupationEntity occupation = this.occupationRepo.findByCode(request.getCode());
 		List<OccupationDto> result = null;
 		if (occupation == null) {
+			CorporateEntity corporate = corporateRepo.findByCorporateCode(additionalInfo.get("corporate_code").toString());
+			if(corporate == null) {
+				throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+			}
 			occupation = new OccupationEntity();
-			occupation.setCorporate(employee.getCorporate());
+			occupation.setCorporate(corporate);
 		} else {
 			request.setId(occupation.getId());
 			result = new ArrayList<OccupationDto>();

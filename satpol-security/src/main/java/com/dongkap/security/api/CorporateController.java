@@ -42,7 +42,7 @@ public class CorporateController extends BaseControllerException {
 	public ResponseEntity<SelectResponseDto> getSelectRole(Authentication authentication,
 														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 														 @RequestBody(required = true) FilterDto filter) throws Exception {
-		return new ResponseEntity<SelectResponseDto>(this.corporateService.getSelectCorporate(filter), HttpStatus.OK);
+		return new ResponseEntity<SelectResponseDto>(this.corporateService.getSelect(filter), HttpStatus.OK);
 	}
 
 	@ResponseSuccess(SuccessCode.OK_DEFAULT)
