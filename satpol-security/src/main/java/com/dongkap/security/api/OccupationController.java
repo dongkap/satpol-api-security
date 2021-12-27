@@ -46,7 +46,7 @@ public class OccupationController extends BaseControllerException {
 	}
 
 	@RequestMapping(value = "/vw/auth/select/occupation/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<SelectResponseDto> getSelectRole(Authentication authentication,
+	public ResponseEntity<SelectResponseDto> getSelectOccupation(Authentication authentication,
 														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 														 @RequestBody(required = true) FilterDto filter) throws Exception {
 		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);

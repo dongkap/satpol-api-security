@@ -38,7 +38,7 @@ public class AppImplService extends CommonService {
 		response.setTotalFiltered(Long.valueOf(app.getContent().size()));
 		response.setTotalRecord(this.appRepo.count(AppSpecification.getSelect(filter.getKeyword())));
 		app.getContent().forEach(value -> {
-			response.getData().add(new SelectDto(value.getAppName(), value.getAppCode(), !value.isActive(), null));
+			response.getData().add(new SelectDto(value.getAppName(), value.getAppCode(), !value.getActive(), null));
 		});
 		return response;
 	}
@@ -54,7 +54,7 @@ public class AppImplService extends CommonService {
 			temp.setAppCode(value.getAppCode());
 			temp.setAppName(value.getAppName());
 			temp.setDescription(value.getDescription());
-			temp.setActive(value.isActive());
+			temp.setActive(value.getActive());
 			temp.setVersion(value.getVersion());
 			temp.setCreatedDate(value.getCreatedDate());
 			temp.setCreatedBy(value.getCreatedBy());

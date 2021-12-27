@@ -192,7 +192,7 @@ public class MenuImplService {
 			value.getMenuI18n().forEach(i18n->{
 				data.setLabel(i18n.getTitle());
 				data.setValue(value.getId());
-				data.setDisabled(!value.isActive());
+				data.setDisabled(!value.getActive());
 			});
 			response.getData().add(data);
 		});
@@ -306,7 +306,7 @@ public class MenuImplService {
 		menuItemDto.setI18n(menuI18n);
 		treeMenuDto.setChildren(this.getTreeChildren(menu, locale));
 		treeMenuDto.setItem(menuItemDto);
-		treeMenuDto.setDisabled(!menu.isActive());
+		treeMenuDto.setDisabled(!menu.getActive());
 		return treeMenuDto;
 	}
 
@@ -362,7 +362,7 @@ public class MenuImplService {
 		});
 		treeMenuDto.setChildren(this.getTreeChildrenFunction(menu, function.getChildsMenu(), locale));
 		treeMenuDto.setItem(menuItemDto);
-		treeMenuDto.setDisabled(!menu.isActive());
+		treeMenuDto.setDisabled(!menu.getActive());
 		return treeMenuDto;
 	}
 	

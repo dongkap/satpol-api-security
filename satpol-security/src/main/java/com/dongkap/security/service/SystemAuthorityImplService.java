@@ -39,7 +39,7 @@ public class SystemAuthorityImplService extends CommonService {
 		response.setTotalFiltered(Long.valueOf(role.getContent().size()));
 		response.setTotalRecord(systemAuthorityRepo.count(SystemAuhtoritySpecification.getSelect(filter.getKeyword())));
 		role.getContent().forEach(value -> {
-			response.getData().add(new SelectDto(value.getName(), value.getCode(), !value.isActive(), null));
+			response.getData().add(new SelectDto(value.getName(), value.getCode(), !value.getActive(), null));
 		});
 		return response;
 	}
@@ -53,7 +53,7 @@ public class SystemAuthorityImplService extends CommonService {
 			SystemAuthorityDto temp = new SystemAuthorityDto();
 			temp.setCode(value.getCode());
 			temp.setName(value.getName());
-			temp.setActive(value.isActive());
+			temp.setActive(value.getActive());
 			temp.setVersion(value.getVersion());
 			temp.setCreatedDate(value.getCreatedDate());
 			temp.setCreatedBy(value.getCreatedBy());

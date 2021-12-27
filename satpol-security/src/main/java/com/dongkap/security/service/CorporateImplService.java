@@ -42,7 +42,7 @@ public class CorporateImplService extends CommonService {
 		response.setTotalFiltered(Long.valueOf(corporate.getContent().size()));
 		response.setTotalRecord(corporateRepo.count(CorporateSpecification.getSelect(filter.getKeyword())));
 		corporate.getContent().forEach(value -> {
-			response.getData().add(new SelectDto(value.getCorporateName(), value.getCorporateCode(), !value.isActive(), null));
+			response.getData().add(new SelectDto(value.getCorporateName(), value.getCorporateCode(), !value.getActive(), null));
 		});
 		return response;
 	}
@@ -62,7 +62,7 @@ public class CorporateImplService extends CommonService {
 			temp.setAddress(value.getAddress());
 			temp.setTelpNumber(value.getTelpNumber());
 			temp.setFaxNumber(value.getFaxNumber());
-			temp.setActive(value.isActive());
+			temp.setActive(value.getActive());
 			temp.setVersion(value.getVersion());
 			temp.setCreatedDate(value.getCreatedDate());
 			temp.setCreatedBy(value.getCreatedBy());

@@ -42,7 +42,7 @@ public class RoleImplService extends CommonService {
 		response.setTotalFiltered(Long.valueOf(role.getContent().size()));
 		response.setTotalRecord(roleRepo.count(RoleSpecification.getSelect(filter.getKeyword())));
 		role.getContent().forEach(value -> {
-			response.getData().add(new SelectDto(value.getDescription(), value.getAuthority(), !value.isActive(), null));
+			response.getData().add(new SelectDto(value.getDescription(), value.getAuthority(), !value.getActive(), null));
 		});
 		return response;
 	}
@@ -56,7 +56,7 @@ public class RoleImplService extends CommonService {
 			RoleDto temp = new RoleDto();
 			temp.setAuthority(value.getAuthority());
 			temp.setDescription(value.getDescription());
-			temp.setActive(value.isActive());
+			temp.setActive(value.getActive());
 			temp.setVersion(value.getVersion());
 			temp.setCreatedDate(value.getCreatedDate());
 			temp.setCreatedBy(value.getCreatedBy());

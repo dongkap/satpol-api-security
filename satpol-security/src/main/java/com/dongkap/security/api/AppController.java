@@ -39,7 +39,7 @@ public class AppController extends BaseControllerException {
 	}
 
 	@RequestMapping(value = "/vw/auth/select/app/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<SelectResponseDto> getSelectRole(Authentication authentication,
+	public ResponseEntity<SelectResponseDto> getSelectApp(Authentication authentication,
 														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 														 @RequestBody(required = true) FilterDto filter) throws Exception {
 		return new ResponseEntity<SelectResponseDto>(this.appService.getSelect(filter), HttpStatus.OK);

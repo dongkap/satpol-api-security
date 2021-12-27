@@ -52,7 +52,7 @@ public class OccupationImplService extends CommonService {
 		response.setTotalFiltered(Long.valueOf(occupation.getContent().size()));
 		response.setTotalRecord(occupationRepo.count(OccupationSpecification.getSelect(filter.getKeyword())));
 		occupation.getContent().forEach(value -> {
-			response.getData().add(new SelectDto(value.getName(), value.getCode(), !value.isActive(), null));
+			response.getData().add(new SelectDto(value.getName(), value.getCode(), !value.getActive(), null));
 		});
 		return response;
 	}
@@ -73,7 +73,7 @@ public class OccupationImplService extends CommonService {
 			temp.setName(value.getName());
 			temp.setCorporateCode(value.getCorporate().getCorporateCode());
 			temp.setCorporateName(value.getCorporate().getCorporateName());
-			temp.setActive(value.isActive());
+			temp.setActive(value.getActive());
 			temp.setVersion(value.getVersion());
 			temp.setCreatedDate(value.getCreatedDate());
 			temp.setCreatedBy(value.getCreatedBy());

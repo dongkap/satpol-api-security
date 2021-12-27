@@ -40,7 +40,7 @@ public class EmployeeImplService extends CommonService {
 		response.setAddress(corporate.getAddress());
 		response.setTelpNumber(corporate.getTelpNumber());
 		response.setFaxNumber(corporate.getFaxNumber());
-		response.setActive(corporate.isActive());
+		response.setActive(corporate.getActive());
 		response.setVersion(corporate.getVersion());
 		response.setCreatedDate(corporate.getCreatedDate());
 		response.setCreatedBy(corporate.getCreatedBy());

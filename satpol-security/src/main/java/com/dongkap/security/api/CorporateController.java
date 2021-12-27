@@ -39,7 +39,7 @@ public class CorporateController extends BaseControllerException {
 	}
 
 	@RequestMapping(value = "/vw/auth/select/corporate/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<SelectResponseDto> getSelectRole(Authentication authentication,
+	public ResponseEntity<SelectResponseDto> getSelectCorporate(Authentication authentication,
 														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 														 @RequestBody(required = true) FilterDto filter) throws Exception {
 		return new ResponseEntity<SelectResponseDto>(this.corporateService.getSelect(filter), HttpStatus.OK);

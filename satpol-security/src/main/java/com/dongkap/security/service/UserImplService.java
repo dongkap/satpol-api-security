@@ -87,7 +87,7 @@ public class UserImplService extends CommonService {
 			ProfileDto temp = new ProfileDto();
 			temp.setUsername(value.getUsername());
 			temp.setEmail(value.getEmail());
-			temp.setActive(value.isActive());
+			temp.setActive(value.getActive());
 			temp.setVersion(value.getVersion());
 			temp.setCreatedDate(value.getCreatedDate());
 			temp.setCreatedBy(value.getCreatedBy());
@@ -175,7 +175,7 @@ public class UserImplService extends CommonService {
 		response.setTotalFiltered(Long.valueOf(userEntity.getRoles().size()));
 		response.setTotalRecord(Long.valueOf(userEntity.getRoles().size()));
 		userEntity.getRoles().forEach(value -> {
-			response.getData().add(new SelectDto(value.getDescription(), value.getAuthority(), !value.isActive(), null));
+			response.getData().add(new SelectDto(value.getDescription(), value.getAuthority(), !value.getActive(), null));
 		});
 		return response;
 	}

@@ -29,7 +29,7 @@ public class BaseAuditEntity implements Serializable {
 	protected Integer version = 1;
 
 	@Column(name = "is_active", nullable = false)
-    protected boolean active = true;
+    protected Boolean active = true;
 
 	@Temporal(TemporalType.TIMESTAMP)
     @Column(name="created_date", updatable = false)
