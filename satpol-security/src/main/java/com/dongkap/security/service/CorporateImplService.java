@@ -74,7 +74,7 @@ public class CorporateImplService extends CommonService {
 	}
 	
 	@Transactional
-	@PublishStream(key = StreamKeyStatic.CORPORATE, status = ParameterStatic.UPDATE_DATA)
+	@PublishStream(key = StreamKeyStatic.CORPORATE, status = ParameterStatic.PERSIST_DATA)
 	public List<CorporateDto> postCorporate(CorporateDto request, String username) throws Exception {
 		CorporateEntity corporate = this.corporateRepo.findByCorporateCode(request.getCorporateCode());
 		List<CorporateDto> result = null;

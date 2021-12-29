@@ -85,7 +85,7 @@ public class OccupationImplService extends CommonService {
 	}
 	
 	@Transactional
-	@PublishStream(key = StreamKeyStatic.OCCUPATION, status = ParameterStatic.UPDATE_DATA)
+	@PublishStream(key = StreamKeyStatic.OCCUPATION, status = ParameterStatic.PERSIST_DATA)
 	public List<OccupationDto> postOccupation(Map<String, Object> additionalInfo, OccupationDto request) throws Exception {
 		if(additionalInfo.get("corporate_code") == null) {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
@@ -110,6 +110,7 @@ public class OccupationImplService extends CommonService {
 		return result;
 	}
 
+	@PublishStream(key = StreamKeyStatic.OCCUPATION, status = ParameterStatic.DELETE_DATA)
 	public void deleteOccupations(List<String> occupationCodes) throws Exception {
 		List<OccupationEntity> occupations = occupationRepo.findByCodeIn(occupationCodes);
 		try {
