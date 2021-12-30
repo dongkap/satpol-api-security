@@ -91,7 +91,6 @@ public class OccupationImplService extends CommonService {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
 		}
 		OccupationEntity occupation = this.occupationRepo.findByCode(request.getCode());
-		List<OccupationDto> result = null;
 		if (occupation == null) {
 			CorporateEntity corporate = corporateRepo.findByCorporateCode(additionalInfo.get("corporate_code").toString());
 			if(corporate == null) {
@@ -99,27 +98,38 @@ public class OccupationImplService extends CommonService {
 			}
 			occupation = new OccupationEntity();
 			occupation.setCorporate(corporate);
-		} else {
-			request.setId(occupation.getId());
-			result = new ArrayList<OccupationDto>();
-			result.add(request);
 		}
 		occupation.setCode(request.getCode());
 		occupation.setName(request.getName());
-		occupationRepo.saveAndFlush(occupation);
-		return result;
+		occupation = occupationRepo.saveAndFlush(occupation);
+
+		List<OccupationDto> publishDto = new ArrayList<OccupationDto>();
+		request.setId(occupation.getId());
+		request.setCode(occupation.getCode());
+		request.setName(occupation.getName());
+		publishDto.add(request);
+		return publishDto;
 	}
 
 	@PublishStream(key = StreamKeyStatic.OCCUPATION, status = ParameterStatic.DELETE_DATA)
-	public void deleteOccupations(List<String> occupationCodes) throws Exception {
+	public List<OccupationDto> deleteOccupations(List<String> occupationCodes) throws Exception {
 		List<OccupationEntity> occupations = occupationRepo.findByCodeIn(occupationCodes);
 		try {
-			occupationRepo.deleteInBatch(occupations);			
+			occupationRepo.deleteInBatch(occupations);
 		} catch (DataIntegrityViolationException e) {
 			throw new SystemErrorException(ErrorCode.ERR_SCR0009);
 		} catch (ConstraintViolationException e) {
 			throw new SystemErrorException(ErrorCode.ERR_SCR0009);
 		}
+		List<OccupationDto> result = new ArrayList<OccupationDto>();
+		OccupationDto occupation = new OccupationDto();
+		occupations.forEach(entity->{
+			occupation.setId(entity.getId());
+			occupation.setCode(entity.getCode());
+			occupation.setName(entity.getName());
+		});
+		result.add(occupation);
+		return result;
 	}
 
 }

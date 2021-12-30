@@ -77,13 +77,8 @@ public class CorporateImplService extends CommonService {
 	@PublishStream(key = StreamKeyStatic.CORPORATE, status = ParameterStatic.PERSIST_DATA)
 	public List<CorporateDto> postCorporate(CorporateDto request, String username) throws Exception {
 		CorporateEntity corporate = this.corporateRepo.findByCorporateCode(request.getCorporateCode());
-		List<CorporateDto> result = null;
 		if (corporate == null) {
 			corporate = new CorporateEntity();
-		} else {
-			request.setId(corporate.getId());
-			result = new ArrayList<CorporateDto>();
-			result.add(request);
 		}
 		corporate.setCorporateCode(request.getCorporateCode());
 		corporate.setCorporateName(request.getCorporateName());
@@ -92,10 +87,17 @@ public class CorporateImplService extends CommonService {
 		corporate.setAddress(request.getAddress());
 		corporate.setTelpNumber(request.getTelpNumber());
 		corporate.setFaxNumber(request.getFaxNumber());
-		corporateRepo.saveAndFlush(corporate);
-		return result;
+		corporate = corporateRepo.saveAndFlush(corporate);
+
+		List<CorporateDto> publishDto = new ArrayList<CorporateDto>();
+		request.setId(corporate.getId());
+		request.setCorporateCode(corporate.getCorporateCode());
+		request.setCorporateName(corporate.getCorporateName());
+		publishDto.add(request);
+		return publishDto;
 	}
 
+	@PublishStream(key = StreamKeyStatic.CORPORATE, status = ParameterStatic.DELETE_DATA)
 	public void deleteCorporates(List<String> corporateCodes) throws Exception {
 		List<CorporateEntity> corporates = corporateRepo.findByCorporateCodeIn(corporateCodes);
 		try {
