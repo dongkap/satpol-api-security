@@ -98,7 +98,7 @@ public class CorporateImplService extends CommonService {
 	}
 
 	@PublishStream(key = StreamKeyStatic.CORPORATE, status = ParameterStatic.DELETE_DATA)
-	public void deleteCorporates(List<String> corporateCodes) throws Exception {
+	public List<CorporateDto> deleteCorporates(List<String> corporateCodes) throws Exception {
 		List<CorporateEntity> corporates = corporateRepo.findByCorporateCodeIn(corporateCodes);
 		try {
 			corporateRepo.deleteInBatch(corporates);			
@@ -107,6 +107,15 @@ public class CorporateImplService extends CommonService {
 		} catch (ConstraintViolationException e) {
 			throw new SystemErrorException(ErrorCode.ERR_SCR0009);
 		}
+		List<CorporateDto> publishDto = new ArrayList<CorporateDto>();		
+		corporates.forEach(entity->{
+			CorporateDto corporate = new CorporateDto();
+			corporate.setId(entity.getId());
+			corporate.setCorporateCode(entity.getCorporateCode());
+			corporate.setCorporateName(entity.getCorporateName());;
+			publishDto.add(corporate);
+		});
+		return publishDto;
 	}
 
 }

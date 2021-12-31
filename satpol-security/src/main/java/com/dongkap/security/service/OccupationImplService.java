@@ -121,15 +121,15 @@ public class OccupationImplService extends CommonService {
 		} catch (ConstraintViolationException e) {
 			throw new SystemErrorException(ErrorCode.ERR_SCR0009);
 		}
-		List<OccupationDto> result = new ArrayList<OccupationDto>();
-		OccupationDto occupation = new OccupationDto();
+		List<OccupationDto> publishStream = new ArrayList<OccupationDto>();
 		occupations.forEach(entity->{
+			OccupationDto occupation = new OccupationDto();
 			occupation.setId(entity.getId());
 			occupation.setCode(entity.getCode());
 			occupation.setName(entity.getName());
+			publishStream.add(occupation);
 		});
-		result.add(occupation);
-		return result;
+		return publishStream;
 	}
 
 }
