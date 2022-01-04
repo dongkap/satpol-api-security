@@ -40,6 +40,11 @@ public class JwtTokenConfiguration {
 					accessToken.getAdditionalInformation().put("theme", temp.get("theme"));
 					accessToken.getAdditionalInformation().put("server_date", DateUtil.DATE.format(new Date()));
 					accessToken.getAdditionalInformation().put("xrkey", publicKey);
+					if(accessToken.getAdditionalInformation().containsKey("corporate_uuid")) {
+						accessToken.getAdditionalInformation().put("corporate_uuid", temp.get("corporate_uuid"));
+						accessToken.getAdditionalInformation().put("corporate_code", temp.get("corporate_code"));
+						accessToken.getAdditionalInformation().put("corporate_name", temp.get("corporate_name"));						
+					}
 					OAuth2AccessToken newAccessToken = super.enhance(accessToken, authentication);
 					newAccessToken.getAdditionalInformation().putAll(temp);
 					return newAccessToken;

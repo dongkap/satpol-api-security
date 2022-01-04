@@ -33,21 +33,35 @@ public class ParameterListenerService extends CommonStreamListener<CommonStreamM
     @SneakyThrows
     @Transactional
 	public void onMessage(ObjectRecord<String, CommonStreamMessageDto> message) {
-        String stream = message.getStream();
-        RecordId id = message.getId();
-		LOGGER.info("A message was received stream: [{}], id: [{}]", stream, id);
-        CommonStreamMessageDto value = message.getValue();
-        if(value != null) {
-        	for(Object data: value.getDatas()) {
-	        	if(data instanceof ParameterI18nDto) {
-	        		ParameterI18nDto param = (ParameterI18nDto)data;
-	        		ParameterI18nEntity parameterI18n = parameterI18nRepo.findById(param.getParameterI18nUUID()).orElse(null);
-	        		if(parameterI18n != null && value.getStatus().equalsIgnoreCase(ParameterStatic.UPDATE_DATA)) {
-		        		parameterI18n.setParameterValue(param.getParameterValue());
-		        		parameterI18nRepo.save(parameterI18n);
-	        		}
-	        	}
+		try {
+	        String stream = message.getStream();
+	        RecordId id = message.getId();
+			LOGGER.info("A message was received stream: [{}], id: [{}]", stream, id);
+	        CommonStreamMessageDto value = message.getValue();
+	        if(value != null) {
+	        	for(Object data: value.getDatas()) {
+		        	if(data instanceof ParameterI18nDto) {
+		        		ParameterI18nDto param = (ParameterI18nDto)data;
+		        		if(value.getStatus().equalsIgnoreCase(ParameterStatic.UPDATE_DATA)) {
+			        		this.update(param);
+		        		}
+		        	}
+		        }
 	        }
-        }
+		} catch (Exception e) {
+			LOGGER.warn("Stream On Message : {}", e.getMessage());
+		}
+	}
+	
+	public void update(ParameterI18nDto request) {
+		try {
+			ParameterI18nEntity parameterI18n = parameterI18nRepo.findById(request.getParameterI18nUUID()).orElse(null);
+			if(parameterI18n != null) {
+	    		parameterI18n.setParameterValue(request.getParameterValue());
+	    		parameterI18nRepo.save(parameterI18n);
+			}
+		} catch (Exception e) {
+			LOGGER.warn("Stream Update : {}", e.getMessage());
+		}	
 	}
 }

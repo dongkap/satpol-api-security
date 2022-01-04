@@ -64,8 +64,11 @@ public class SecurityTokenEnhancer implements TokenEnhancer {
 			}
 			try {
 				CorporateDto corporate = this.employeeService.getCorporate(user.getUsername());
-				additionalInfo.put("corporate_code", corporate.getCorporateCode());
-				additionalInfo.put("corporate_name", corporate.getCorporateName());
+				if(corporate != null) {
+					additionalInfo.put("corporate_uuid", corporate.getId());
+					additionalInfo.put("corporate_code", corporate.getCorporateCode());
+					additionalInfo.put("corporate_name", corporate.getCorporateName());	
+				}
 			} catch (SystemErrorException e) {
 			} catch (Exception e) {
 				LOGGER.error(e.getMessage(), e);
