@@ -33,6 +33,7 @@ public class EmployeeImplService extends CommonService {
 		}
 		CorporateEntity corporate = employee.getCorporate();
 		CorporateDto response = new CorporateDto();
+		response.setId(corporate.getId());
 		response.setCorporateCode(corporate.getCorporateCode());
 		response.setCorporateName(corporate.getCorporateName());
 		response.setCorporateNonExpired(corporate.isCorporateNonExpired());
