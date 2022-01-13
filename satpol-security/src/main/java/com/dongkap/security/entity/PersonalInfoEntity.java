@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -46,6 +47,10 @@ public class PersonalInfoEntity extends BaseAuditEntity {
 	
 	@Column(name = "gender", nullable = false)
 	private String gender;
+
+	@ManyToOne(targetEntity = ParameterEntity.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "gender", nullable = false, referencedColumnName = "parameter_code", insertable = false, updatable = false)
+	private ParameterEntity parameterGender;
 	
 	@Column(name = "place_of_birth", nullable = false)
 	private String placeOfBirth;
@@ -58,6 +63,9 @@ public class PersonalInfoEntity extends BaseAuditEntity {
 	
 	@Column(name = "weight", nullable = true)
 	private Double weight;
+	
+	@Column(name = "blood_type", nullable = true)
+	private String bloodType;
 
 	@OneToOne(targetEntity = UserEntity.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_uuid", nullable = false, updatable = false)

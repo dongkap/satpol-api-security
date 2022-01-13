@@ -29,8 +29,8 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper=false, exclude={"user", "corporate", "occupation", "parentEmployee", "childEmployees"})
-@ToString(exclude={"user", "corporate", "occupation", "parentEmployee", "childEmployees"})
+@EqualsAndHashCode(callSuper=false, exclude={"user", "personalInfo", "contactUser", "corporate", "occupation", "parentEmployee", "childEmployees"})
+@ToString(exclude={"user", "personalInfo", "contactUser", "corporate", "occupation", "parentEmployee", "childEmployees"})
 @Entity
 @Table(name = "sec_employee", schema = SchemaDatabase.SECURITY)
 public class EmployeeEntity extends BaseAuditEntity {
@@ -53,8 +53,19 @@ public class EmployeeEntity extends BaseAuditEntity {
 	private String lastEducationDegree;
 
 	@OneToOne(targetEntity = UserEntity.class, fetch = FetchType.LAZY)
+	@Fetch(FetchMode.JOIN)
 	@JoinColumn(name = "user_uuid", nullable = false, updatable = false)
 	private UserEntity user;
+	
+	@OneToOne(targetEntity = PersonalInfoEntity.class, fetch = FetchType.LAZY)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "user_uuid", nullable = false, referencedColumnName = "user_uuid", insertable = false, updatable = false)
+	private PersonalInfoEntity personalInfo;
+	
+	@OneToOne(targetEntity = ContactUserEntity.class, fetch = FetchType.LAZY)
+	@Fetch(FetchMode.JOIN)
+	@JoinColumn(name = "user_uuid", nullable = false, referencedColumnName = "user_uuid", insertable = false, updatable = false)
+	private ContactUserEntity contactUser;
 
 	@OneToOne(targetEntity = CorporateEntity.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "corporate_uuid", nullable = false)

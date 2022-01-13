@@ -59,10 +59,12 @@ public class ProfileImplService {
 			if (!p_dto.getEmail().equals(user.getEmail())) {
 				if (p_dto.getEmail().matches(PatternGlobal.EMAIL.getRegex())) {
 					UserEntity tmpUser = this.userRepo.loadByUsernameOrEmail(p_dto.getEmail(), p_dto.getEmail());
-					if(tmpUser == null) {
-						user.setEmail(p_dto.getEmail());
+					if(tmpUser != null) {
+						if(!tmpUser.getEmail().equals(p_user.getEmail())) {
+							throw new SystemErrorException(ErrorCode.ERR_SCR0010);	
+						}
 					} else {
-						throw new SystemErrorException(ErrorCode.ERR_SCR0010);
+						user.setEmail(p_dto.getEmail());
 					}
 				} else
 					throw new SystemErrorException(ErrorCode.ERR_SCR0008);
@@ -206,6 +208,7 @@ public class ProfileImplService {
 		personalInfo.setDateOfBirth(DateUtil.DATE.parse(p_dto.getPersonalInfo().getDateOfBirth()));
 		personalInfo.setHeight(p_dto.getPersonalInfo().getHeight());
 		personalInfo.setWeight(p_dto.getPersonalInfo().getWeight());
+		personalInfo.setBloodType(p_dto.getPersonalInfo().getBloodType());
 		personalInfo.setUser(user);
 		this.personalInfoRepo.save(personalInfo);
 	}
