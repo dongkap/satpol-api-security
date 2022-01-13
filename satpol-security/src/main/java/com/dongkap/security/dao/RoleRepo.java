@@ -12,6 +12,8 @@ public interface RoleRepo extends JpaRepository<RoleEntity, String>, JpaSpecific
 
 	RoleEntity findByAuthority(String authority);
 
+	List<RoleEntity> findByAuthorityNotIn(List<String> authorities);
+
 	List<RoleEntity> findByAuthorityIn(List<String> authorities);
 	
 }

@@ -38,8 +38,11 @@ public class EducationEntity extends BaseAuditEntity {
 	@GeneratedValue(generator = "uuid")
     @Column(name = "education_uuid", nullable = false, unique=true)
 	private String id;
+	
+	@Column(name = "educational_level", nullable = false)
+	private String educationalLevel;
 
-	@Column(name = "school_name", nullable = false)
+	@Column(name = "school_name")
 	private String schoolName;
 	
 	@Column(name = "degree")

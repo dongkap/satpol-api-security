@@ -49,8 +49,8 @@ public class EmployeeEntity extends BaseAuditEntity {
 	@Column(name = "id_employee", nullable = false)
 	private String idEmployee;
 	
-	@Column(name = "last_education_degree")
-	private String lastEducationDegree;
+	@Column(name = "last_educational_level")
+	private String lastEducationLevel;
 
 	@OneToOne(targetEntity = UserEntity.class, fetch = FetchType.LAZY)
 	@Fetch(FetchMode.JOIN)

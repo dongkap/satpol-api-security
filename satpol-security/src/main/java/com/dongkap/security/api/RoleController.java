@@ -44,7 +44,14 @@ public class RoleController extends BaseControllerException {
 		return new ResponseEntity<CommonResponseDto<RoleDto>>(this.roleService.getDatatable(filter), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/vw/auth/select/role/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/vw/auth/select/all-role/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<SelectResponseDto> getSelectAllRole(Authentication authentication,
+														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
+														 @RequestBody(required = true) FilterDto filter) throws Exception {
+		return new ResponseEntity<SelectResponseDto>(this.roleService.getSelectAllRole(filter), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/vw/auth/select/role/v.2", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<SelectResponseDto> getSelectRole(Authentication authentication,
 														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 														 @RequestBody(required = true) FilterDto filter) throws Exception {

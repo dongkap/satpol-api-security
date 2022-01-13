@@ -1,5 +1,6 @@
 package com.dongkap.security.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.exception.ConstraintViolationException;
@@ -36,12 +37,26 @@ public class RoleImplService extends CommonService {
 	@Autowired
 	private SystemAuthorityRepo systemAuthorityRepo;
 
-	public SelectResponseDto getSelectRole(FilterDto filter) throws Exception {
+	public SelectResponseDto getSelectAllRole(FilterDto filter) throws Exception {
 		Page<RoleEntity> role = roleRepo.findAll(RoleSpecification.getSelect(filter.getKeyword()), page(filter.getOrder(), filter.getOffset(), filter.getLimit()));
 		final SelectResponseDto response = new SelectResponseDto();
 		response.setTotalFiltered(Long.valueOf(role.getContent().size()));
 		response.setTotalRecord(roleRepo.count(RoleSpecification.getSelect(filter.getKeyword())));
 		role.getContent().forEach(value -> {
+			response.getData().add(new SelectDto(value.getDescription(), value.getAuthority(), !value.getActive(), null));
+		});
+		return response;
+	}
+
+	public SelectResponseDto getSelectRole(FilterDto filter) throws Exception {
+		List<String> notAuthorities = new ArrayList<String>();
+		notAuthorities.add("ROLE_ADMINISTRATOR");
+		notAuthorities.add("ROLE_END_USER");
+		List<RoleEntity> role = roleRepo.findByAuthorityNotIn(notAuthorities);
+		final SelectResponseDto response = new SelectResponseDto();
+		response.setTotalFiltered(Long.valueOf(role.size()));
+		response.setTotalRecord(Long.valueOf(role.size()));
+		role.forEach(value -> {
 			response.getData().add(new SelectDto(value.getDescription(), value.getAuthority(), !value.getActive(), null));
 		});
 		return response;
