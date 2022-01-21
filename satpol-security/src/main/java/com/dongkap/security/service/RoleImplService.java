@@ -70,6 +70,7 @@ public class RoleImplService extends CommonService {
 		role.getContent().forEach(value -> {
 			RoleDto temp = new RoleDto();
 			temp.setAuthority(value.getAuthority());
+			temp.setLevel(value.getLevel());
 			temp.setDescription(value.getDescription());
 			temp.setActive(value.getActive());
 			temp.setVersion(value.getVersion());
@@ -95,6 +96,7 @@ public class RoleImplService extends CommonService {
 				role = new RoleEntity();
 				role.setAuthority(request.getAuthority());
 			}
+			role.setLevel(request.getLevel());
 			role.setSysAuth(sysAuth);
 			role.setDescription(request.getDescription());
 			roleRepo.saveAndFlush(role);

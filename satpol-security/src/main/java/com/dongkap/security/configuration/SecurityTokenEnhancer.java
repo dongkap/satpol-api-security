@@ -75,6 +75,7 @@ public class SecurityTokenEnhancer implements TokenEnhancer {
 			}
 	        additionalInfo.put("username", user.getUsername());
 	        additionalInfo.put("authority", user.getAuthorityDefault());
+	        additionalInfo.put("app_code", user.getAppCode());
 	        additionalInfo.put("provider", user.getProvider());
 	        additionalInfo.put("email", user.getEmail());
 	        additionalInfo.put("name", user.getName());

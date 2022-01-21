@@ -100,6 +100,7 @@ public class FunctionImplService {
 				role = new RoleEntity();
 				role.setAuthority(request.getAuthority());
 			}
+			role.setLevel(request.getLevel());
 			role.setSysAuth(sysAuth);
 			role.setDescription(request.getDescription());
 			return roleRepo.saveAndFlush(role);

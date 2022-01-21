@@ -51,6 +51,9 @@ public class RoleEntity extends BaseAuditEntity {
 	@Column(name = "role_name", unique = true)
 	private String authority;
 
+	@Column(name = "role_level", nullable = false)
+	private Integer level = 0;
+
 	@Column(name = "description")
 	private String description;
 

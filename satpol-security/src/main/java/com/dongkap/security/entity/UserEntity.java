@@ -86,7 +86,7 @@ public class UserEntity extends BaseAuditEntity implements UserDetails, OAuth2Us
 	private String fullname;
 
 	@Column(name = "provider", nullable = false)
-	private String provider = "ldap";
+	private String provider = "local";
 
 	@Column(name = "verification_code", nullable = true)
 	private String verificationCode;
@@ -102,6 +102,9 @@ public class UserEntity extends BaseAuditEntity implements UserDetails, OAuth2Us
 
 	@Column(name = "authority_default")
 	private String authorityDefault;
+
+	@Column(name = "app_code")
+	private String appCode;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "sec_r_user_app",
@@ -152,7 +155,7 @@ public class UserEntity extends BaseAuditEntity implements UserDetails, OAuth2Us
         return this.attributes;
     }
 	
-	@OneToOne(mappedBy = "user", targetEntity = SettingsEntity.class, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+	@OneToOne(mappedBy = "user", targetEntity = SettingsEntity.class, fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@Fetch(FetchMode.SELECT)
 	private SettingsEntity settings;
 
@@ -167,7 +170,7 @@ public class UserEntity extends BaseAuditEntity implements UserDetails, OAuth2Us
 		this.verificationCode,
 				this.verificationExpired,
 				this.raw,
-				this.authorityDefault, getAuthorities(), this.getAttributes());
+				this.authorityDefault, this.appCode, getAuthorities(), this.getAttributes());
 		return userPrincipal;
 	}
 

@@ -3,6 +3,7 @@ package com.dongkap.security.entity;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -57,12 +58,12 @@ public class EmployeeEntity extends BaseAuditEntity {
 	@JoinColumn(name = "user_uuid", nullable = false, updatable = false)
 	private UserEntity user;
 	
-	@OneToOne(targetEntity = PersonalInfoEntity.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = PersonalInfoEntity.class, fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@Fetch(FetchMode.JOIN)
 	@JoinColumn(name = "user_uuid", nullable = false, referencedColumnName = "user_uuid", insertable = false, updatable = false)
 	private PersonalInfoEntity personalInfo;
 	
-	@OneToOne(targetEntity = ContactUserEntity.class, fetch = FetchType.LAZY)
+	@OneToOne(targetEntity = ContactUserEntity.class, fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST })
 	@Fetch(FetchMode.JOIN)
 	@JoinColumn(name = "user_uuid", nullable = false, referencedColumnName = "user_uuid", insertable = false, updatable = false)
 	private ContactUserEntity contactUser;

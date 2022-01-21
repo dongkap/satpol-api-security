@@ -32,6 +32,7 @@ public class JwtTokenConfiguration {
 					accessToken.getAdditionalInformation().clear();
 					accessToken.getAdditionalInformation().put("username", temp.get("username"));
 					accessToken.getAdditionalInformation().put("authority", temp.get("authority"));
+					accessToken.getAdditionalInformation().put("app_code", temp.get("app_code"));
 					accessToken.getAdditionalInformation().put("provider", temp.get("provider"));
 					accessToken.getAdditionalInformation().put("email", temp.get("email"));
 					accessToken.getAdditionalInformation().put("name", temp.get("name"));

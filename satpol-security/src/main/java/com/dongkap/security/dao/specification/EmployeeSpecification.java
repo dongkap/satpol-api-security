@@ -33,18 +33,52 @@ public class EmployeeSpecification {
 						if (value != null) {
 							switch (key) {
 								case "_label" :
-								case "fullname" :
+									predicate = builder.disjunction();
 									// builder.upper for PostgreSQL
 									predicate.getExpressions().add(builder.like(builder.upper(root.join("user").<String>get("fullname")), String.format("%%%s%%", value.toString().toUpperCase())));
-									break;
-								case "idEmployee" :
 									predicate.getExpressions().add(builder.equal(root.get("idEmployee"), value));
 									break;
-								case "occupationName" :
-									predicate.getExpressions().add(builder.like(builder.upper(root.join("occupation").<String>get("name")), String.format("%%%s%%", value.toString().toUpperCase())));
+								case "corporateCode" :
+									predicate = builder.and(predicate, builder.equal(root.join("corporate").<String>get("corporateCode"), value.toString()));
+									break;
+							}
+						}
+					}
+				}
+				predicate = builder.and(predicate, builder.equal(root.get(IS_ACTIVE), true));
+				return predicate;
+			}
+		};
+	}
+
+	public static Specification<EmployeeEntity> getSelectEmployeeParent(final Map<String, Object> keyword) {
+		return new Specification<EmployeeEntity>() {
+
+			/**
+			 * 
+			 */
+			private static final long serialVersionUID = -637621292944403277L;
+
+			@Override
+			public Predicate toPredicate(Root<EmployeeEntity> root, CriteriaQuery<?> criteria, CriteriaBuilder builder) {
+				Predicate predicate = builder.conjunction();
+				if (!keyword.isEmpty()) {
+					for(Map.Entry<String, Object> filter : keyword.entrySet()) {
+						String key = filter.getKey();
+						Object value = filter.getValue();
+						if (value != null) {
+							switch (key) {
+								case "_label" :
+									predicate = builder.disjunction();
+									// builder.upper for PostgreSQL
+									predicate.getExpressions().add(builder.like(builder.upper(root.join("user").<String>get("fullname")), String.format("%%%s%%", value.toString().toUpperCase())));
+									predicate.getExpressions().add(builder.equal(root.get("idEmployee"), value));
+									break;
+								case "occupationCode" :
+									predicate = builder.and(predicate, builder.notEqual(root.join("occupation").<String>get("code"), value.toString()));
 									break;
 								case "corporateCode" :
-									predicate.getExpressions().add(builder.equal(root.join("corporate").<String>get("corporateCode"), value.toString()));
+									predicate = builder.and(predicate, builder.equal(root.join("corporate").<String>get("corporateCode"), value.toString()));
 									break;
 							}
 						}
