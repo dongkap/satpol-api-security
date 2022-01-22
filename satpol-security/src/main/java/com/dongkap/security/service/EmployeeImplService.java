@@ -187,7 +187,7 @@ public class EmployeeImplService extends CommonService {
 	}
 	
 	@Transactional
-	@PublishStream(key = StreamKeyStatic.EMPLOYEE, status = ParameterStatic.INSERT_DATA)
+	@PublishStream(key = StreamKeyStatic.EMPLOYEE, status = ParameterStatic.PERSIST_DATA)
 	public List<EmployeeDto> postEmployee(Map<String, Object> additionalInfo, EmployeeRequestAddDto request) throws Exception {
 		if(additionalInfo.get("corporate_code") == null) {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
@@ -239,7 +239,9 @@ public class EmployeeImplService extends CommonService {
 		this.trainingRepo.saveAndFlush(training);
 
 		List<EmployeeDto> publishDto = new ArrayList<EmployeeDto>();
-		request.setId(employee.getId());;
+		request.setId(employee.getId());
+		request.setUsername(employee.getUser().getUsername());
+		request.getOccupation().setId(occupation.getId());
 		publishDto.add(request);
 		return publishDto;
 	}
