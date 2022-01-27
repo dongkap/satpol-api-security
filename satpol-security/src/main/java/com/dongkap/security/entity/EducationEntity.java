@@ -6,6 +6,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
@@ -59,6 +60,10 @@ public class EducationEntity extends BaseAuditEntity {
 	
 	@Column(name = "education_end_year")
 	private int endYear;
+
+	@ManyToOne(targetEntity = ParameterEntity.class, fetch = FetchType.EAGER)
+	@JoinColumn(name = "educational_level", nullable = false, referencedColumnName = "parameter_code", insertable = false, updatable = false)
+	private ParameterEntity level;
 
 	@OneToOne(targetEntity = EmployeeEntity.class, fetch = FetchType.LAZY)
 	@JoinColumn(name = "employee_uuid", nullable = false, updatable = false)

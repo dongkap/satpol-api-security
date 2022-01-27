@@ -28,6 +28,7 @@ import com.dongkap.dto.security.ContactUserDto;
 import com.dongkap.dto.security.CorporateDto;
 import com.dongkap.dto.security.EmployeeDto;
 import com.dongkap.dto.security.EmployeeListDto;
+import com.dongkap.dto.security.EmployeePersonalInfoDto;
 import com.dongkap.dto.security.EmployeeRequestAddDto;
 import com.dongkap.dto.security.PersonalInfoDto;
 import com.dongkap.dto.security.RoleDto;
@@ -130,6 +131,7 @@ public class EmployeeImplService extends CommonService {
 		response.setTotalRecord(employeeRepo.count(EmployeeSpecification.getDatatable(filter.getKeyword())));
 		employee.getContent().forEach(value -> {
 			EmployeeListDto temp = new EmployeeListDto();
+			temp.setId(value.getId());
 			temp.setIdEmployee(value.getIdEmployee());
 			temp.setActive(value.getActive());
 			temp.setVersion(value.getVersion());
@@ -152,6 +154,38 @@ public class EmployeeImplService extends CommonService {
 			response.getData().add(temp);
 		});
 		return response;
+	}
+
+	@Transactional
+	public EmployeePersonalInfoDto getEmployeePersonalInfo(Map<String, Object> additionalInfo, Map<String, Object> data) throws Exception {
+		if(additionalInfo.get("corporate_code") == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
+		if(data.get("employeeId") == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);			
+		}
+		EmployeeEntity employee = employeeRepo.findById(data.get("employeeId").toString()).orElse(null);
+		if(employee != null) {
+			final EmployeePersonalInfoDto response = new EmployeePersonalInfoDto();
+			response.setId(employee.getId());
+			response.setIdEmployee(employee.getIdEmployee());
+			response.setIdNumber(employee.getPersonalInfo().getIdNumber());
+			response.setFullname(employee.getUser().getFullname());
+			response.setEmail(employee.getUser().getEmail());
+			response.setPhoneNumber(employee.getContactUser().getPhoneNumber());
+			response.setAddress(employee.getContactUser().getAddress());
+			response.setHeight(employee.getPersonalInfo().getHeight());
+			response.setWeight(employee.getPersonalInfo().getWeight());
+			response.setBloodType(employee.getPersonalInfo().getBloodType());
+			response.setImage(employee.getUser().getImage());
+			response.setActive(employee.getActive());
+			response.setVersion(employee.getVersion());
+			response.setCreatedDate(employee.getCreatedDate());
+			response.setCreatedBy(employee.getCreatedBy());
+			response.setModifiedDate(employee.getModifiedDate());
+			return response;
+		} else
+			throw new SystemErrorException(ErrorCode.ERR_SCR0010);
 	}
 
 	@Transactional
@@ -187,7 +221,7 @@ public class EmployeeImplService extends CommonService {
 	}
 	
 	@Transactional
-	@PublishStream(key = StreamKeyStatic.EMPLOYEE, status = ParameterStatic.PERSIST_DATA)
+	@PublishStream(key = StreamKeyStatic.EMPLOYEE, status = ParameterStatic.INSERT_DATA)
 	public List<EmployeeDto> postEmployee(Map<String, Object> additionalInfo, EmployeeRequestAddDto request) throws Exception {
 		if(additionalInfo.get("corporate_code") == null) {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);

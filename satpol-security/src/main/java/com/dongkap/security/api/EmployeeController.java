@@ -24,6 +24,7 @@ import com.dongkap.dto.common.ApiBaseResponse;
 import com.dongkap.dto.common.CommonResponseDto;
 import com.dongkap.dto.common.FilterDto;
 import com.dongkap.dto.security.EmployeeListDto;
+import com.dongkap.dto.security.EmployeePersonalInfoDto;
 import com.dongkap.dto.security.EmployeeRequestAddDto;
 import com.dongkap.dto.select.SelectResponseDto;
 import com.dongkap.security.service.EmployeeImplService;
@@ -43,6 +44,14 @@ public class EmployeeController extends BaseControllerException {
 			@RequestBody(required = true) FilterDto filter) throws Exception {
 		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
 		return new ResponseEntity<CommonResponseDto<EmployeeListDto>>(this.employeeService.getDatatable(additionalInfo, filter), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/vw/auth/personal-info/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<EmployeePersonalInfoDto> getEmployeePersonalInfo(Authentication authentication,
+														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
+														 @RequestBody(required = true) Map<String, Object> data) throws Exception {
+		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
+		return new ResponseEntity<EmployeePersonalInfoDto>(this.employeeService.getEmployeePersonalInfo(additionalInfo, data), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/vw/auth/select/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
