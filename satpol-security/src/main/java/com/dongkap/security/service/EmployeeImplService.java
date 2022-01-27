@@ -50,6 +50,7 @@ import com.dongkap.security.entity.CorporateEntity;
 import com.dongkap.security.entity.EducationEntity;
 import com.dongkap.security.entity.EmployeeEntity;
 import com.dongkap.security.entity.OccupationEntity;
+import com.dongkap.security.entity.ParameterI18nEntity;
 import com.dongkap.security.entity.PersonalInfoEntity;
 import com.dongkap.security.entity.RoleEntity;
 import com.dongkap.security.entity.SettingsEntity;
@@ -90,6 +91,9 @@ public class EmployeeImplService extends CommonService {
 	
 	@Value("${dongkap.signature.aes.secret-key}")
 	private String secretKey;
+
+	@Value("${dongkap.locale}")
+	private String locale;
 
 	@Transactional
 	public CorporateDto getCorporate(String username) throws Exception {
@@ -157,15 +161,19 @@ public class EmployeeImplService extends CommonService {
 	}
 
 	@Transactional
-	public EmployeePersonalInfoDto getEmployeePersonalInfo(Map<String, Object> additionalInfo, Map<String, Object> data) throws Exception {
+	public EmployeePersonalInfoDto getEmployeePersonalInfo(Map<String, Object> additionalInfo, Map<String, Object> data, String p_locale) throws Exception {
 		if(additionalInfo.get("corporate_code") == null) {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
 		}
 		if(data.get("employeeId") == null) {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);			
 		}
+		if(p_locale == null) {
+			p_locale = this.locale;
+		}
 		EmployeeEntity employee = employeeRepo.findById(data.get("employeeId").toString()).orElse(null);
 		if(employee != null) {
+			final String locale = p_locale;
 			final EmployeePersonalInfoDto response = new EmployeePersonalInfoDto();
 			response.setId(employee.getId());
 			response.setIdEmployee(employee.getIdEmployee());
@@ -183,6 +191,12 @@ public class EmployeeImplService extends CommonService {
 			response.setCreatedDate(employee.getCreatedDate());
 			response.setCreatedBy(employee.getCreatedBy());
 			response.setModifiedDate(employee.getModifiedDate());
+			if(employee.getPersonalInfo().getParameterGender() != null) {
+				ParameterI18nEntity parameter = employee.getPersonalInfo().getParameterGender().getParameterI18n().stream().filter(paramI8n->paramI8n.getLocaleCode().equalsIgnoreCase(locale)).findFirst().orElse(null);
+				if(parameter != null) {
+					response.setGender(parameter.getParameterValue());
+				}
+			}
 			return response;
 		} else
 			throw new SystemErrorException(ErrorCode.ERR_SCR0010);
