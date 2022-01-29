@@ -79,6 +79,15 @@ public class EmployeeController extends BaseControllerException {
 		return new ResponseEntity<ApiBaseResponse>(new ApiBaseResponse(), HttpStatus.OK);
 	}
 
+	@ResponseSuccess(SuccessCode.OK_DEFAULT)
+	@RequestMapping(value = "/trx/auth/put/employee-personal-info/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ApiBaseResponse> putEmployeePersonalInfo(Authentication authentication,
+			@RequestBody(required = true) EmployeePersonalInfoDto data) throws Exception {
+		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
+		this.employeeService.putEmployeePersonalInfo(additionalInfo, data);
+		return new ResponseEntity<ApiBaseResponse>(new ApiBaseResponse(), HttpStatus.OK);
+	}
+
 	public Map<String, Object> getAdditionalInformation(Authentication auth) {
 	    OAuth2AuthenticationDetails auth2AuthenticationDetails = (OAuth2AuthenticationDetails) auth.getDetails();
 	    return tokenStore.readAccessToken(auth2AuthenticationDetails.getTokenValue()).getAdditionalInformation();

@@ -30,6 +30,7 @@ import com.dongkap.dto.security.EmployeeDto;
 import com.dongkap.dto.security.EmployeeListDto;
 import com.dongkap.dto.security.EmployeePersonalInfoDto;
 import com.dongkap.dto.security.EmployeeRequestAddDto;
+import com.dongkap.dto.security.OccupationDto;
 import com.dongkap.dto.security.PersonalInfoDto;
 import com.dongkap.dto.security.RoleDto;
 import com.dongkap.dto.select.SelectDto;
@@ -171,32 +172,39 @@ public class EmployeeImplService extends CommonService {
 		if(p_locale == null) {
 			p_locale = this.locale;
 		}
-		EmployeeEntity employee = employeeRepo.findById(data.get("employeeId").toString()).orElse(null);
+		EmployeeEntity employee = employeeRepo.findByIdAndCorporate_CorporateCode(data.get("employeeId").toString(), additionalInfo.get("corporate_code").toString());
 		if(employee != null) {
 			final String locale = p_locale;
 			final EmployeePersonalInfoDto response = new EmployeePersonalInfoDto();
 			response.setId(employee.getId());
 			response.setIdEmployee(employee.getIdEmployee());
-			response.setIdNumber(employee.getPersonalInfo().getIdNumber());
 			response.setFullname(employee.getUser().getFullname());
 			response.setEmail(employee.getUser().getEmail());
-			response.setPhoneNumber(employee.getContactUser().getPhoneNumber());
-			response.setAddress(employee.getContactUser().getAddress());
-			response.setHeight(employee.getPersonalInfo().getHeight());
-			response.setWeight(employee.getPersonalInfo().getWeight());
-			response.setBloodType(employee.getPersonalInfo().getBloodType());
 			response.setImage(employee.getUser().getImage());
 			response.setActive(employee.getActive());
 			response.setVersion(employee.getVersion());
 			response.setCreatedDate(employee.getCreatedDate());
 			response.setCreatedBy(employee.getCreatedBy());
 			response.setModifiedDate(employee.getModifiedDate());
+			PersonalInfoDto personalInfo = new PersonalInfoDto();;
+			personalInfo.setIdNumber(employee.getPersonalInfo().getIdNumber());
+			personalInfo.setPlaceOfBirth(employee.getPersonalInfo().getPlaceOfBirth());
+			personalInfo.setDateOfBirth(DateUtil.DATE.format(employee.getPersonalInfo().getDateOfBirth()));
+			personalInfo.setHeight(employee.getPersonalInfo().getHeight());
+			personalInfo.setWeight(employee.getPersonalInfo().getWeight());
+			personalInfo.setBloodType(employee.getPersonalInfo().getBloodType());
+			personalInfo.setGenderCode(employee.getPersonalInfo().getParameterGender().getParameterCode());
 			if(employee.getPersonalInfo().getParameterGender() != null) {
 				ParameterI18nEntity parameter = employee.getPersonalInfo().getParameterGender().getParameterI18n().stream().filter(paramI8n->paramI8n.getLocaleCode().equalsIgnoreCase(locale)).findFirst().orElse(null);
 				if(parameter != null) {
-					response.setGender(parameter.getParameterValue());
+					personalInfo.setGenderValue(parameter.getParameterValue());
 				}
 			}
+			response.setPersonalInfo(personalInfo);
+			ContactUserDto contactUser = new ContactUserDto(); 
+			contactUser.setPhoneNumber(employee.getContactUser().getPhoneNumber());
+			contactUser.setAddress(employee.getContactUser().getAddress());
+			response.setContact(contactUser);
 			return response;
 		} else
 			throw new SystemErrorException(ErrorCode.ERR_SCR0010);
@@ -233,7 +241,7 @@ public class EmployeeImplService extends CommonService {
 		});
 		return response;
 	}
-	
+
 	@Transactional
 	@PublishStream(key = StreamKeyStatic.EMPLOYEE, status = ParameterStatic.INSERT_DATA)
 	public List<EmployeeDto> postEmployee(Map<String, Object> additionalInfo, EmployeeRequestAddDto request) throws Exception {
@@ -252,7 +260,7 @@ public class EmployeeImplService extends CommonService {
 		employee.setLastEducationLevel(request.getLastEducation());
 		employee.setUser(user);
 		employee.setContactUser(createContact(request.getContact(), user));
-		employee.setPersonalInfo(createPersonalInfo(request.getPersonalInfo(), user));;
+		employee.setPersonalInfo(createPersonalInfo(request.getPersonalInfo(), user));
 		CorporateEntity corporate = corporateRepo.findByCorporateCode(additionalInfo.get("corporate_code").toString());
 		if(corporate == null) {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
@@ -260,13 +268,16 @@ public class EmployeeImplService extends CommonService {
 		employee.setCorporate(corporate);
 		EmployeeEntity employeeParent = this.employeeRepo.findById(request.getParentId()).orElse(null);
 		employee.setParentEmployee(employeeParent);
+		if(request.getOccupation() == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
 		OccupationEntity occupation = this.occupationRepo.findByCode(request.getOccupation().getCode());
 		if(occupation == null) {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
 		}
 		employee.setOccupation(occupation);
 		employee = this.employeeRepo.saveAndFlush(employee);
-		
+
 		EducationEntity education = new EducationEntity();
 		education.setEducationalLevel(request.getEducation().getEducationalLevel());
 		education.setDegree(request.getEducation().getDegree());
@@ -277,7 +288,7 @@ public class EmployeeImplService extends CommonService {
 		education.setEndYear(request.getEducation().getEndYear());
 		education.setEmployee(employee);
 		this.educationRepo.saveAndFlush(education);
-		
+
 		TrainingEntity training = new TrainingEntity();
 		training.setCode(request.getTraining().getName().toUpperCase().replaceAll("[^a-zA-Z0-9]+",""));
 		training.setName(request.getTraining().getName());
@@ -293,7 +304,64 @@ public class EmployeeImplService extends CommonService {
 		publishDto.add(request);
 		return publishDto;
 	}
-	
+
+	@Transactional
+	@PublishStream(key = StreamKeyStatic.EMPLOYEE, status = ParameterStatic.UPDATE_DATA)
+	public List<EmployeeDto> putEmployeePersonalInfo(Map<String, Object> additionalInfo, EmployeePersonalInfoDto request) throws Exception {
+		if(additionalInfo.get("corporate_code") == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
+
+		EmployeeEntity employee = this.employeeRepo.findByIdAndCorporate_CorporateCode(request.getId(), additionalInfo.get("corporate_code").toString());
+		if(employee == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);	
+		}
+
+		UserEntity user = employee.getUser();
+		if(user == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		} else {
+			UserEntity checkUser = this.userRepo.loadByUsernameOrEmail(request.getEmail().toLowerCase(), request.getEmail().toLowerCase());
+			if(checkUser != null) {
+				if(!checkUser.getUsername().equals(user.getUsername())) {
+					throw new SystemErrorException(ErrorCode.ERR_SCR0010);	
+				}
+			}
+			user.setUsername(request.getEmail());
+			user.setEmail(request.getEmail());
+			user.setFullname(request.getFullname());
+			user = this.userRepo.saveAndFlush(user);
+		}
+		employee.setUser(user);
+
+		if(employee.getContactUser() == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);	
+		}
+		employee.getContactUser().setPhoneNumber(request.getContact().getPhoneNumber());
+		employee.getContactUser().setAddress(request.getContact().getAddress());
+
+		if (request.getPersonalInfo().getIdNumber() == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0405);
+		}
+		if(employee.getPersonalInfo() == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);	
+		}
+		employee.getPersonalInfo().setIdNumber(request.getPersonalInfo().getIdNumber());
+
+		employee.setIdEmployee(request.getIdEmployee());
+		employee = this.employeeRepo.saveAndFlush(employee);
+
+		List<EmployeeDto> publishDto = new ArrayList<EmployeeDto>();
+		request.setId(employee.getId());
+		request.setUsername(employee.getUser().getUsername());
+		OccupationDto occupationDto = new OccupationDto();
+		occupationDto.setId(employee.getOccupation().getId());
+		occupationDto.setCode(employee.getOccupation().getCode());
+		request.setOccupation(occupationDto);
+		publishDto.add(request);
+		return publishDto;
+	}
+
 	private UserEntity createUser(EmployeeDto p_dto, String appCode) throws Exception {
 		UserEntity user = this.userRepo.loadByUsernameOrEmail(p_dto.getEmail().toLowerCase(), p_dto.getEmail().toLowerCase());
 		if(user == null) {
