@@ -10,5 +10,7 @@ import com.dongkap.security.entity.TrainingEntity;
 public interface TrainingRepo extends JpaRepository<TrainingEntity, String>, JpaSpecificationExecutor<TrainingEntity> {
 	
 	List<TrainingEntity> findByEmployee_Id(String employeeId);
+
+	List<TrainingEntity> findByIdIn(List<String> trainingIds);
 	
 }

@@ -80,7 +80,7 @@ public class EmployeeController extends BaseControllerException {
 	}
 
 	@ResponseSuccess(SuccessCode.OK_DEFAULT)
-	@RequestMapping(value = "/trx/auth/put/employee-personal-info/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/trx/auth/put/personal-info/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ApiBaseResponse> putEmployeePersonalInfo(Authentication authentication,
 			@RequestBody(required = true) EmployeePersonalInfoDto data) throws Exception {
 		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);

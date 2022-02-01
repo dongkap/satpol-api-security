@@ -8,7 +8,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import com.dongkap.security.entity.EducationEntity;
 
 public interface EducationRepo extends JpaRepository<EducationEntity, String>, JpaSpecificationExecutor<EducationEntity> {
-	
+
 	List<EducationEntity> findByEmployee_Id(String employeeId);
+
+	List<EducationEntity> findByIdIn(List<String> educationIds);
 
 }
