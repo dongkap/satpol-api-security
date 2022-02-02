@@ -26,6 +26,7 @@ import com.dongkap.dto.common.FilterDto;
 import com.dongkap.dto.security.EmployeeListDto;
 import com.dongkap.dto.security.EmployeePersonalInfoDto;
 import com.dongkap.dto.security.EmployeeRequestAddDto;
+import com.dongkap.dto.security.EmployeeStatusDto;
 import com.dongkap.dto.select.SelectResponseDto;
 import com.dongkap.security.service.EmployeeImplService;
 
@@ -52,6 +53,14 @@ public class EmployeeController extends BaseControllerException {
 														 @RequestBody(required = true) Map<String, Object> data) throws Exception {
 		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
 		return new ResponseEntity<EmployeePersonalInfoDto>(this.employeeService.getEmployeePersonalInfo(additionalInfo, data, locale), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = "/vw/auth/status/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<EmployeeStatusDto> getEmployeeStatus(Authentication authentication,
+														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
+														 @RequestBody(required = true) Map<String, Object> data) throws Exception {
+		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
+		return new ResponseEntity<EmployeeStatusDto>(this.employeeService.getEmployeeStatus(additionalInfo, data), HttpStatus.OK);
 	}
 
 	@RequestMapping(value = "/vw/auth/select/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -85,6 +94,15 @@ public class EmployeeController extends BaseControllerException {
 			@RequestBody(required = true) EmployeePersonalInfoDto data) throws Exception {
 		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
 		this.employeeService.putEmployeePersonalInfo(additionalInfo, data);
+		return new ResponseEntity<ApiBaseResponse>(new ApiBaseResponse(), HttpStatus.OK);
+	}
+
+	@ResponseSuccess(SuccessCode.OK_DEFAULT)
+	@RequestMapping(value = "/trx/auth/put/status/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ApiBaseResponse> putEmployeeStatus(Authentication authentication,
+			@RequestBody(required = true) EmployeeStatusDto data) throws Exception {
+		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
+		this.employeeService.putEmployeeStatus(additionalInfo, data);
 		return new ResponseEntity<ApiBaseResponse>(new ApiBaseResponse(), HttpStatus.OK);
 	}
 

@@ -30,6 +30,7 @@ import com.dongkap.dto.security.EmployeeDto;
 import com.dongkap.dto.security.EmployeeListDto;
 import com.dongkap.dto.security.EmployeePersonalInfoDto;
 import com.dongkap.dto.security.EmployeeRequestAddDto;
+import com.dongkap.dto.security.EmployeeStatusDto;
 import com.dongkap.dto.security.OccupationDto;
 import com.dongkap.dto.security.PersonalInfoDto;
 import com.dongkap.dto.security.RoleDto;
@@ -186,7 +187,7 @@ public class EmployeeImplService extends CommonService {
 			response.setCreatedDate(employee.getCreatedDate());
 			response.setCreatedBy(employee.getCreatedBy());
 			response.setModifiedDate(employee.getModifiedDate());
-			PersonalInfoDto personalInfo = new PersonalInfoDto();;
+			PersonalInfoDto personalInfo = new PersonalInfoDto();
 			personalInfo.setIdNumber(employee.getPersonalInfo().getIdNumber());
 			personalInfo.setPlaceOfBirth(employee.getPersonalInfo().getPlaceOfBirth());
 			personalInfo.setDateOfBirth(DateUtil.DATE.format(employee.getPersonalInfo().getDateOfBirth()));
@@ -205,6 +206,57 @@ public class EmployeeImplService extends CommonService {
 			contactUser.setPhoneNumber(employee.getContactUser().getPhoneNumber());
 			contactUser.setAddress(employee.getContactUser().getAddress());
 			response.setContact(contactUser);
+			return response;
+		} else
+			throw new SystemErrorException(ErrorCode.ERR_SCR0010);
+	}
+
+	@Transactional
+	public EmployeeStatusDto getEmployeeStatus(Map<String, Object> additionalInfo, Map<String, Object> data) throws Exception {
+		if(additionalInfo.get("corporate_code") == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
+		if(data.get("employeeId") == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);			
+		}
+		EmployeeEntity employee = employeeRepo.findByIdAndCorporate_CorporateCode(data.get("employeeId").toString(), additionalInfo.get("corporate_code").toString());
+		if(employee != null) {
+			final EmployeeStatusDto response = new EmployeeStatusDto();
+			response.setId(employee.getId());
+			response.setIdEmployee(employee.getIdEmployee());
+			response.setFullname(employee.getUser().getFullname());
+			response.setEmail(employee.getUser().getEmail());
+			response.setUsername(employee.getUser().getUsername());
+			response.setDisabled(!employee.getUser().isEnabled());
+			response.setLocked(!employee.getUser().isAccountNonLocked());
+			response.setAccountExpired(!employee.getUser().isAccountNonExpired());;
+			response.setActive(employee.getActive());
+			response.setVersion(employee.getVersion());
+			response.setCreatedDate(employee.getCreatedDate());
+			response.setCreatedBy(employee.getCreatedBy());
+			response.setModifiedDate(employee.getModifiedDate());;
+			CorporateDto corporate = new CorporateDto();
+			corporate.setId(employee.getCorporate().getId());
+			corporate.setCorporateCode(employee.getCorporate().getCorporateCode());
+			corporate.setCorporateName(employee.getCorporate().getCorporateName());
+			response.setCorporate(corporate);
+			OccupationDto occupation = new OccupationDto();
+			occupation.setId(employee.getOccupation().getId());
+			occupation.setCode(employee.getOccupation().getCode());
+			occupation.setName(employee.getOccupation().getName());
+			response.setOccupation(occupation);
+			employee.getUser().getRoles().forEach(roleEntity->{
+				RoleDto role = new RoleDto();
+				role.setId(roleEntity.getId());
+				role.setAuthority(roleEntity.getAuthority());
+				role.setDescription(roleEntity.getDescription());
+				response.getRoles().add(role);
+			});
+			if(employee.getParentEmployee() != null) {
+				response.setParentId(employee.getParentEmployee().getId());
+				response.setParentLabel(employee.getParentEmployee().getIdEmployee() + " - " + employee.getParentEmployee().getUser().getFullname());
+				response.setParentValue(employee.getParentEmployee().getId());
+			};
 			return response;
 		} else
 			throw new SystemErrorException(ErrorCode.ERR_SCR0010);
@@ -358,6 +410,54 @@ public class EmployeeImplService extends CommonService {
 		occupationDto.setId(employee.getOccupation().getId());
 		occupationDto.setCode(employee.getOccupation().getCode());
 		request.setOccupation(occupationDto);
+		publishDto.add(request);
+		return publishDto;
+	}
+
+	@Transactional
+	@PublishStream(key = StreamKeyStatic.EMPLOYEE, status = ParameterStatic.UPDATE_DATA)
+	public List<EmployeeDto> putEmployeeStatus(Map<String, Object> additionalInfo, EmployeeStatusDto request) throws Exception {
+		if(additionalInfo.get("corporate_code") == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
+
+		EmployeeEntity employee = this.employeeRepo.findByIdAndCorporate_CorporateCode(request.getId(), additionalInfo.get("corporate_code").toString());
+		if(employee == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);	
+		}
+
+		UserEntity user = employee.getUser();
+		if(user == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		} else {
+	        for(RoleDto roleDto: request.getRoles()) {
+	        	RoleEntity role = this.roleRepo.findByAuthority(roleDto.getAuthority());
+				user.getRoles().add(role);
+	        }
+			user.setAuthorityDefault(request.getRoles().get(0).getAuthority());
+			user.setAccountNonExpired(!request.getAccountExpired());
+			user.setEnabled(!request.getDisabled());
+			user.setAccountNonLocked(!request.getLocked());
+			user = this.userRepo.saveAndFlush(user);
+		}
+		employee.setUser(user);
+		
+		EmployeeEntity employeeParent = this.employeeRepo.findById(request.getParentId()).orElse(null);
+		employee.setParentEmployee(employeeParent);
+		if(request.getOccupation() == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
+		OccupationEntity occupation = this.occupationRepo.findByCode(request.getOccupation().getCode());
+		if(occupation == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
+		employee.setOccupation(occupation);
+		employee = this.employeeRepo.saveAndFlush(employee);
+
+		List<EmployeeDto> publishDto = new ArrayList<EmployeeDto>();
+		request.setId(employee.getId());
+		request.setUsername(employee.getUser().getUsername());
+		request.getOccupation().setId(occupation.getId());
 		publishDto.add(request);
 		return publishDto;
 	}
