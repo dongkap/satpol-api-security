@@ -56,7 +56,9 @@ public class CheckAccountImplService {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
 	}
 
-	public ApiBaseResponse checkUserByUsenamerOrEmail(String p_user, String p_locale) throws Exception {
+	public ApiBaseResponse checkUserByUsenamerOrEmail(Map<String, String> p_dto, String p_locale) throws Exception {
+		String p_user = p_dto.get("user");
+		String p_existUser = p_dto.get("exist"); 
 		if(p_user != null) {
 			UserEntity userEntity = userRepo.findByUsername(p_user.toLowerCase());
 			Locale locale = Locale.getDefault();
@@ -64,8 +66,13 @@ public class CheckAccountImplService {
 			if(p_locale != null)
 				locale = Locale.forLanguageTag(p_locale);
 			if (userEntity != null) {
-				response.setRespStatusCode(ErrorCode.ERR_SYS0302.name());
-				response.getRespStatusMessage().put(ErrorCode.ERR_SYS0302.name(), messageSource.getMessage(ErrorCode.ERR_SYS0302.name(), null, locale));
+				if(!userEntity.getUsername().equalsIgnoreCase(p_existUser)) {
+					response.setRespStatusCode(ErrorCode.ERR_SYS0302.name());
+					response.getRespStatusMessage().put(ErrorCode.ERR_SYS0302.name(), messageSource.getMessage(ErrorCode.ERR_SYS0302.name(), null, locale));
+				} else {
+					response.setRespStatusCode(SuccessCode.OK_SCR012.name());
+					response.getRespStatusMessage().put(SuccessCode.OK_SCR012.name(), messageSource.getMessage(SuccessCode.OK_SCR012.name(), null, locale));	
+				}
 			} else {
 				response.setRespStatusCode(SuccessCode.OK_SCR012.name());
 				response.getRespStatusMessage().put(SuccessCode.OK_SCR012.name(), messageSource.getMessage(SuccessCode.OK_SCR012.name(), null, locale));

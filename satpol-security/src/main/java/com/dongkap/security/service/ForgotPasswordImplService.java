@@ -1,9 +1,11 @@
 package com.dongkap.security.service;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -12,17 +14,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.data.redis.connection.stream.ObjectRecord;
+import org.springframework.data.redis.connection.stream.StreamRecords;
+import org.springframework.data.redis.core.ReactiveRedisOperations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.dongkap.common.exceptions.SystemErrorException;
 import com.dongkap.common.pattern.PatternGlobal;
 import com.dongkap.common.security.AESEncrypt;
+import com.dongkap.common.stream.PublishStream;
 import com.dongkap.common.utils.AuthorizationProvider;
 import com.dongkap.common.utils.ErrorCode;
+import com.dongkap.common.utils.ParameterStatic;
 import com.dongkap.common.utils.RandomString;
+import com.dongkap.common.utils.StreamKeyStatic;
 import com.dongkap.common.utils.SuccessCode;
 import com.dongkap.dto.common.ApiBaseResponse;
+import com.dongkap.dto.common.CommonStreamMessageDto;
 import com.dongkap.dto.notification.MailNotificationDto;
 import com.dongkap.dto.security.ForgotPasswordDto;
 import com.dongkap.dto.security.RequestForgotPasswordDto;
@@ -43,30 +53,37 @@ public class ForgotPasswordImplService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	/**
-	 * TO DO FIXME
-	 */
-	// @Autowired
-	// private MailSenderService mailSenderService;
+	@Autowired
+	private ReactiveRedisOperations<String, CommonStreamMessageDto> reactiveRedisTemplate;
+
+	@Value("${dongkap.web.url.forgot-password}")
+	private String urlForgotPassword;
 	
 	@Autowired
 	private MessageSource messageSource;
 
+	@Value("${dongkap.locale}")
+	private String localeCode;
+
+	@Transactional
 	public ApiBaseResponse requestForgotPassword(RequestForgotPasswordDto p_dto, String p_locale) throws Exception {
 		if(p_dto.getEmail() != null) {
 			UserEntity userEntity = userRepo.findByEmail(p_dto.getEmail().toLowerCase()).get();	
 			if(p_dto.getPin()) {
-				return requestForgotPasswordPin(userEntity, p_locale);			
+				this.requestForgotPasswordPin(userEntity, p_locale);
+				ApiBaseResponse response = new ApiBaseResponse();
+				response.setRespStatusCode(SuccessCode.OK_FORGOT_PASSWORD.name());
+				response.getRespStatusMessage().put(response.getRespStatusCode(), userEntity.getId());
+				return response;		
 			} else {
-				if(p_dto.getUrlForgotPassword() != null) {
-					return requestForgotPasswordUrl(userEntity, p_dto.getUrlForgotPassword(), p_locale);
-				} else
-					throw new SystemErrorException(ErrorCode.ERR_SYS0404);
+				this.requestForgotPasswordUrl(userEntity, p_locale);
+				return null;
 			}		
 		} else
 			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
 	}
 
+	@Transactional
 	public ApiBaseResponse verificationForgotPassword(ForgotPasswordDto p_dto, String p_locale) throws Exception {
 		if(p_dto.getVerificationId() != null && p_dto.getVerificationCode() != null) {
 			UserEntity userEntity = userRepo.loadByIdAndVerificationCode(p_dto.getVerificationId(), p_dto.getVerificationCode());
@@ -108,8 +125,8 @@ public class ForgotPasswordImplService {
 		} else
 			throw new SystemErrorException(ErrorCode.ERR_SYS0404);
 	}
-	
-	private ApiBaseResponse requestForgotPasswordPin(UserEntity userEntity, String p_locale) throws Exception {
+
+	public void requestForgotPasswordPin(UserEntity userEntity, String p_locale) throws Exception {
 		if(userEntity != null) {
 			if(userEntity.getProvider().equals(AuthorizationProvider.local.toString())) {
 				Calendar cal = Calendar.getInstance();
@@ -118,35 +135,42 @@ public class ForgotPasswordImplService {
 				userEntity.setVerificationExpired(cal.getTime());
 				userEntity.setVerificationCode(new RandomString(6, new SecureRandom(), RandomString.digits).nextString());
 				Locale locale = Locale.getDefault();
-				if(p_locale != null)
-					locale = Locale.forLanguageTag(p_locale);
+				if(p_locale == null) {
+					p_locale = localeCode;
+				}
+				locale = Locale.forLanguageTag(p_locale);
 				userEntity = this.userRepo.saveAndFlush(userEntity);
 				String template = "forgot-password-pin_"+locale.getLanguage()+".ftl";
 				if(locale == Locale.US)
 					template = "forgot-password-pin.ftl";
 				Map<String, Object> content = new HashMap<String, Object>();
-				content.put("name", userEntity.getFullname());
+				content.put("fullname", userEntity.getFullname());
 				content.put("verificationCode", userEntity.getVerificationCode());
+				content.put("locale", locale);
 				MailNotificationDto mail = new MailNotificationDto();
 				mail.setTo(userEntity.getEmail());
 				mail.setSubject(messageSource.getMessage("subject.mail.forgot-password", null, locale));
 				mail.setContentTemplate(content);
 				mail.setFileNameTemplate(template);
-				/**
-				 * TO DO FIXME
-				 */
-				// this.mailSenderService.sendMessageWithTemplate(mail, locale);
-				ApiBaseResponse response = new ApiBaseResponse();
-				response.setRespStatusCode(SuccessCode.OK_FORGOT_PASSWORD.name());
-				response.getRespStatusMessage().put(response.getRespStatusCode(), userEntity.getId());
-				return response;
+				mail.setLocale(p_locale);
+				List<Object> publishDto = new ArrayList<Object>();
+				publishDto.add(mail);
+				CommonStreamMessageDto message = new CommonStreamMessageDto(StreamKeyStatic.FORGOT_PASSWORD, ParameterStatic.NOTIFICATION, publishDto);
+				ObjectRecord<String, CommonStreamMessageDto> record = StreamRecords.newRecord()
+						.in(StreamKeyStatic.FORGOT_PASSWORD)
+                        .ofObject(message);
+		        this.reactiveRedisTemplate
+		                .opsForStream()
+		                .add(record)
+		                .subscribe();
 			} else
 				throw new SystemErrorException(ErrorCode.ERR_SYS0401);
 		} else
 			throw new SystemErrorException(ErrorCode.ERR_SCR0012);		
 	}
-	
-	private ApiBaseResponse requestForgotPasswordUrl(UserEntity userEntity, String urlForgotPassword, String p_locale) throws Exception {
+
+	@PublishStream(key = StreamKeyStatic.FORGOT_PASSWORD, status = ParameterStatic.NOTIFICATION)
+	public void requestForgotPasswordUrl(UserEntity userEntity, String p_locale) throws Exception {
 		if(userEntity != null) {
 			if(userEntity.getProvider().equals(AuthorizationProvider.local.toString())) {
 				Calendar cal = Calendar.getInstance();
@@ -155,25 +179,33 @@ public class ForgotPasswordImplService {
 				userEntity.setVerificationExpired(cal.getTime());
 				userEntity.setVerificationCode(new RandomString(8).nextString());
 				Locale locale = Locale.getDefault();
-				if(p_locale != null)
-					locale = Locale.forLanguageTag(p_locale);
+				if(p_locale == null) {
+					p_locale = localeCode;
+				}
+				locale = Locale.forLanguageTag(p_locale);
 				userEntity = this.userRepo.saveAndFlush(userEntity);
 				String template = "forgot-password_"+locale.getLanguage()+".ftl";
 				if(locale == Locale.US)
 					template = "forgot-password.ftl";
 				Map<String, Object> content = new HashMap<String, Object>();
-				content.put("name", userEntity.getFullname());
-				content.put("urlForgotPassword", urlForgotPassword +"/"+userEntity.getId()+"/"+userEntity.getVerificationCode());
+				content.put("fullname", userEntity.getFullname());
+				content.put("urlForgotPassword", this.urlForgotPassword +"/"+userEntity.getId()+"/"+userEntity.getVerificationCode());
 				MailNotificationDto mail = new MailNotificationDto();
 				mail.setTo(userEntity.getEmail());
 				mail.setSubject(messageSource.getMessage("subject.mail.forgot-password", null, locale));
 				mail.setContentTemplate(content);
 				mail.setFileNameTemplate(template);
-				/**
-				 * TO DO FIXME
-				 */
-				// this.mailSenderService.sendMessageWithTemplate(mail, locale);
-				return null;					
+				mail.setLocale(p_locale);
+				List<Object> publishDto = new ArrayList<Object>();
+				publishDto.add(mail);
+				CommonStreamMessageDto message = new CommonStreamMessageDto(StreamKeyStatic.FORGOT_PASSWORD, ParameterStatic.NOTIFICATION, publishDto);
+				ObjectRecord<String, CommonStreamMessageDto> record = StreamRecords.newRecord()
+						.in(StreamKeyStatic.FORGOT_PASSWORD)
+                        .ofObject(message);
+		        this.reactiveRedisTemplate
+		                .opsForStream()
+		                .add(record)
+		                .subscribe();
 			} else
 				throw new SystemErrorException(ErrorCode.ERR_SYS0401);
 		} else

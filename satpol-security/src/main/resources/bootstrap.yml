@@ -114,12 +114,16 @@ spring:
 dongkap:
   login:
     single-session: false
+  web:
+    url:
+      forgot-password: http://localhost:4200/auth/forgot-password
 
 ---
 spring:
   profiles: production
-  jpa:
-    show-sql: false
 dongkap:
   login:
     single-session: true
+  web:
+    url:
+      forgot-password: https://portal.smarttanggap.com/auth/forgot-password

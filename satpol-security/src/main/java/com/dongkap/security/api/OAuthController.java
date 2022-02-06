@@ -92,7 +92,7 @@ public class OAuthController extends BaseControllerException {
 	public ResponseEntity<ApiBaseResponse> checkUser(Authentication authentication,
 			@RequestBody(required = true) Map<String, String> p_dto,
 			@RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale) throws Exception {
-		ApiBaseResponse response = this.checkAccountService.checkUserByUsenamerOrEmail(p_dto.get("user"), locale);
+		ApiBaseResponse response = this.checkAccountService.checkUserByUsenamerOrEmail(p_dto, locale);
 		if(response.getRespStatusCode() == ErrorCode.ERR_SYS0302.name()) {
 			return new ResponseEntity<ApiBaseResponse>(response, HttpStatus.FOUND);
 		} else {

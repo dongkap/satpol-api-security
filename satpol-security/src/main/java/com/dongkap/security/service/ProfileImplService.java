@@ -182,6 +182,9 @@ public class ProfileImplService {
 			personalInfoDto.setPlaceOfBirth(personalInfo.getPlaceOfBirth());	
 			personalInfoDto.setDateOfBirth(DateUtil.DATE.format(personalInfo.getDateOfBirth()));
 			personalInfoDto.setAge(this.calculateAge(personalInfo.getDateOfBirth(), new Date()));
+			personalInfoDto.setHeight(personalInfo.getHeight());
+			personalInfoDto.setWeight(personalInfo.getWeight());
+			personalInfoDto.setBloodType(personalInfo.getBloodType());
 			personalInfoDto.setGenderCode(personalInfo.getGender());
 			try {
 				ParameterI18nEntity parameterI18n = parameterI18nRepo.findByParameter_ParameterCodeAndLocaleCode(personalInfo.getGender(), p_locale);
