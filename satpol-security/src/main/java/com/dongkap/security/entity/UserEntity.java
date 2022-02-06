@@ -94,6 +94,12 @@ public class UserEntity extends BaseAuditEntity implements UserDetails, OAuth2Us
 	@Column(name = "verification_expired", nullable = true)
 	private Date verificationExpired;
 
+	@Column(name = "activate_code", nullable = true)
+	private String activateCode;
+
+	@Column(name = "activate_expired", nullable = true)
+	private Date activateExpired;
+
 	@Column(name = "raw", nullable = true)
 	private String raw;
 
@@ -169,6 +175,8 @@ public class UserEntity extends BaseAuditEntity implements UserDetails, OAuth2Us
 				this.accountNonLocked, getName(), this.email, this.provider,
 		this.verificationCode,
 				this.verificationExpired,
+		this.activateCode,
+				this.activateExpired,
 				this.raw,
 				this.authorityDefault, this.appCode, getAuthorities(), this.getAttributes());
 		return userPrincipal;

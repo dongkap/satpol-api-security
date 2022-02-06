@@ -117,6 +117,7 @@ dongkap:
   web:
     url:
       forgot-password: http://localhost:4200/auth/forgot-password
+      activate-account: http://localhost:4200/auth/activate
 
 ---
 spring:
@@ -127,3 +128,4 @@ dongkap:
   web:
     url:
       forgot-password: https://portal.smarttanggap.com/auth/forgot-password
+      activate-account: https://portal.smarttanggap.com/auth/activate

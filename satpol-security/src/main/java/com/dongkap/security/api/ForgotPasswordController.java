@@ -24,14 +24,14 @@ import com.dongkap.security.service.ForgotPasswordImplService;
 public class ForgotPasswordController extends BaseControllerException {
 
 	@Autowired
-	private ForgotPasswordImplService forgotPassword;
+	private ForgotPasswordImplService forgotPasswordService;
 
 	@ResponseSuccess(SuccessCode.OK_REQUEST_FORGOT_PASSWORD)
 	@RequestMapping(value = "/oauth/request-forgot-password", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ApiBaseResponse> requestForgotPassword(Authentication authentication,
 			@RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 			@RequestBody(required = true) RequestForgotPasswordDto p_dto) throws Exception {
-		return new ResponseEntity<ApiBaseResponse>(forgotPassword.requestForgotPassword(p_dto, locale), HttpStatus.OK);
+		return new ResponseEntity<ApiBaseResponse>(forgotPasswordService.requestForgotPassword(p_dto, locale), HttpStatus.OK);
 	}
 
 	@ResponseSuccess(SuccessCode.OK_VERIFICATION_FORGOT_PASSWORD)
@@ -39,7 +39,7 @@ public class ForgotPasswordController extends BaseControllerException {
 	public ResponseEntity<ApiBaseResponse> verificationForgotPassword(Authentication authentication,
 			@RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 			@RequestBody(required = true) ForgotPasswordDto p_dto) throws Exception {
-		return new ResponseEntity<ApiBaseResponse>(forgotPassword.verificationForgotPassword(p_dto, locale), HttpStatus.OK);
+		return new ResponseEntity<ApiBaseResponse>(forgotPasswordService.verificationForgotPassword(p_dto, locale), HttpStatus.OK);
 	}
 
 	@ResponseSuccess(SuccessCode.OK_FORGOT_PASSWORD)
@@ -47,7 +47,7 @@ public class ForgotPasswordController extends BaseControllerException {
 	public ResponseEntity<ApiBaseResponse> forgotPassword(Authentication authentication,
 			@RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 			@RequestBody(required = true) ForgotPasswordDto p_dto) throws Exception {
-		return new ResponseEntity<ApiBaseResponse>(forgotPassword.forgotPassword(p_dto, locale), HttpStatus.OK);
+		return new ResponseEntity<ApiBaseResponse>(forgotPasswordService.forgotPassword(p_dto, locale), HttpStatus.OK);
 	}
 	
 }

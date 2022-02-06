@@ -39,7 +39,7 @@ import com.dongkap.dto.security.RequestForgotPasswordDto;
 import com.dongkap.security.dao.UserRepo;
 import com.dongkap.security.entity.UserEntity;
 
-@Service("forgotPassword")
+@Service("forgotPasswordService")
 public class ForgotPasswordImplService {
 
 	protected Logger LOGGER = LoggerFactory.getLogger(this.getClass());
@@ -98,6 +98,7 @@ public class ForgotPasswordImplService {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0002);
 	}
 
+	@Transactional
 	public ApiBaseResponse forgotPassword(ForgotPasswordDto p_dto, String p_locale) throws Exception {
 		if(p_dto.getVerificationId() != null && p_dto.getVerificationCode() != null) {
 			UserEntity userEntity = userRepo.loadByIdAndVerificationCode(p_dto.getVerificationId(), p_dto.getVerificationCode());
@@ -146,7 +147,6 @@ public class ForgotPasswordImplService {
 				Map<String, Object> content = new HashMap<String, Object>();
 				content.put("fullname", userEntity.getFullname());
 				content.put("verificationCode", userEntity.getVerificationCode());
-				content.put("locale", locale);
 				MailNotificationDto mail = new MailNotificationDto();
 				mail.setTo(userEntity.getEmail());
 				mail.setSubject(messageSource.getMessage("subject.mail.forgot-password", null, locale));
@@ -155,7 +155,7 @@ public class ForgotPasswordImplService {
 				mail.setLocale(p_locale);
 				List<Object> publishDto = new ArrayList<Object>();
 				publishDto.add(mail);
-				CommonStreamMessageDto message = new CommonStreamMessageDto(StreamKeyStatic.FORGOT_PASSWORD, p_locale, ParameterStatic.NOTIFICATION, publishDto);
+				CommonStreamMessageDto message = new CommonStreamMessageDto(StreamKeyStatic.FORGOT_PASSWORD, ParameterStatic.NOTIFICATION, p_locale, publishDto);
 				ObjectRecord<String, CommonStreamMessageDto> record = StreamRecords.newRecord()
 						.in(StreamKeyStatic.FORGOT_PASSWORD)
                         .ofObject(message);
@@ -198,7 +198,7 @@ public class ForgotPasswordImplService {
 				mail.setLocale(p_locale);
 				List<Object> publishDto = new ArrayList<Object>();
 				publishDto.add(mail);
-				CommonStreamMessageDto message = new CommonStreamMessageDto(StreamKeyStatic.FORGOT_PASSWORD, p_locale, ParameterStatic.NOTIFICATION, publishDto);
+				CommonStreamMessageDto message = new CommonStreamMessageDto(StreamKeyStatic.FORGOT_PASSWORD, ParameterStatic.NOTIFICATION, p_locale, publishDto);
 				ObjectRecord<String, CommonStreamMessageDto> record = StreamRecords.newRecord()
 						.in(StreamKeyStatic.FORGOT_PASSWORD)
                         .ofObject(message);

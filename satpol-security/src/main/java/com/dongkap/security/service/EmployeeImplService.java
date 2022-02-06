@@ -2,15 +2,19 @@ package com.dongkap.security.service;
 
 import java.security.SecureRandom;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.MessageSource;
 import org.springframework.data.domain.Page;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +28,7 @@ import com.dongkap.common.utils.RandomString;
 import com.dongkap.common.utils.StreamKeyStatic;
 import com.dongkap.dto.common.CommonResponseDto;
 import com.dongkap.dto.common.FilterDto;
+import com.dongkap.dto.notification.MailNotificationDto;
 import com.dongkap.dto.security.ContactUserDto;
 import com.dongkap.dto.security.CorporateDto;
 import com.dongkap.dto.security.EmployeeDto;
@@ -87,15 +92,20 @@ public class EmployeeImplService extends CommonService {
 	
 	@Autowired
 	private TrainingRepo trainingRepo;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
 	
 	@Value("${dongkap.signature.aes.secret-key}")
 	private String secretKey;
 
 	@Value("${dongkap.locale}")
-	private String locale;
+	private String localeCode;
+
+	@Value("${dongkap.web.url.activate-account}")
+	private String urlActivateAccount;
+	
+	@Autowired
+	private MessageSource messageSource;
+	
+	private static final String NO_SCHOOL = "EDUCATIONAL_LEVEL.NO_EDUCATION";
 
 	@Transactional
 	public CorporateDto getCorporate(String username) throws Exception {
@@ -171,7 +181,7 @@ public class EmployeeImplService extends CommonService {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);			
 		}
 		if(p_locale == null) {
-			p_locale = this.locale;
+			p_locale = this.localeCode;
 		}
 		EmployeeEntity employee = employeeRepo.findByIdAndCorporate_CorporateCode(data.get("employeeId").toString(), additionalInfo.get("corporate_code").toString());
 		if(employee != null) {
@@ -296,7 +306,7 @@ public class EmployeeImplService extends CommonService {
 
 	@Transactional
 	@PublishStream(key = StreamKeyStatic.EMPLOYEE, status = ParameterStatic.INSERT_DATA)
-	public List<EmployeeDto> postEmployee(Map<String, Object> additionalInfo, EmployeeRequestAddDto request) throws Exception {
+	public List<Object> postEmployee(Map<String, Object> additionalInfo, EmployeeRequestAddDto request, String p_locale) throws Exception {
 		if(additionalInfo.get("corporate_code") == null) {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
 		}
@@ -330,30 +340,59 @@ public class EmployeeImplService extends CommonService {
 		employee.setOccupation(occupation);
 		employee = this.employeeRepo.saveAndFlush(employee);
 
-		EducationEntity education = new EducationEntity();
-		education.setEducationalLevel(request.getEducation().getEducationalLevel());
-		education.setDegree(request.getEducation().getDegree());
-		education.setGrade(request.getEducation().getGrade());
-		education.setStudy(request.getEducation().getStudy());
-		education.setSchoolName(request.getEducation().getSchoolName());
-		education.setStartYear(request.getEducation().getStartYear());
-		education.setEndYear(request.getEducation().getEndYear());
-		education.setEmployee(employee);
-		this.educationRepo.saveAndFlush(education);
+		if(request.getEducation() != null) {
+			if(!request.getEducation().getEducationalLevel().equalsIgnoreCase(NO_SCHOOL)) {
+				EducationEntity education = new EducationEntity();
+				education.setEducationalLevel(request.getEducation().getEducationalLevel());
+				education.setDegree(request.getEducation().getDegree());
+				education.setGrade(request.getEducation().getGrade());
+				education.setStudy(request.getEducation().getStudy());
+				education.setSchoolName(request.getEducation().getSchoolName());
+				education.setStartYear(request.getEducation().getStartYear());
+				education.setEndYear(request.getEducation().getEndYear());
+				education.setEmployee(employee);
+				this.educationRepo.saveAndFlush(education);
+			}
+		}
 
-		TrainingEntity training = new TrainingEntity();
-		training.setCode(request.getTraining().getName().toUpperCase().replaceAll("[^a-zA-Z0-9]+",""));
-		training.setName(request.getTraining().getName());
-		training.setStartDate(request.getTraining().getStartDate());
-		training.setEndDate(request.getTraining().getEndDate());
-		training.setEmployee(employee);
-		this.trainingRepo.saveAndFlush(training);
+		if(request.getTraining() != null) {
+			if(!request.getTraining().getName().isBlank()) {
+				TrainingEntity training = new TrainingEntity();
+				training.setCode(request.getTraining().getName().toUpperCase().replaceAll("[^a-zA-Z0-9]+",""));
+				training.setName(request.getTraining().getName());
+				training.setStartDate(request.getTraining().getStartDate());
+				training.setEndDate(request.getTraining().getEndDate());
+				training.setEmployee(employee);
+				this.trainingRepo.saveAndFlush(training);	
+			}
+		}
 
-		List<EmployeeDto> publishDto = new ArrayList<EmployeeDto>();
+		List<Object> publishDto = new ArrayList<Object>();
+		Locale locale = Locale.getDefault();
+		if(p_locale == null) {
+			p_locale = localeCode;
+		}
+		locale = Locale.forLanguageTag(p_locale);
+		String template = "activate-account_"+locale.getLanguage()+".ftl";
+		if(locale == Locale.US)
+			template = "activate-account.ftl";
+		Map<String, Object> content = new HashMap<String, Object>();
+		content.put("fullname", user.getFullname());
+		content.put("urlActivateAccount", this.urlActivateAccount +"/"+user.getId()+"/"+user.getActivateCode());
+		MailNotificationDto mail = new MailNotificationDto();
+		mail.setTo(user.getEmail());
+		mail.setSubject(messageSource.getMessage("subject.mail.activate-account", null, locale));
+		mail.setContentTemplate(content);
+		mail.setFileNameTemplate(template);
+		mail.setLocale(p_locale);
+		publishDto.add(mail);
+        
 		request.setId(employee.getId());
 		request.setUsername(employee.getUser().getUsername());
 		request.getOccupation().setId(occupation.getId());
+		request.getOccupation().setCode(occupation.getCode());
 		publishDto.add(request);
+
 		return publishDto;
 	}
 
@@ -458,6 +497,7 @@ public class EmployeeImplService extends CommonService {
 		request.setId(employee.getId());
 		request.setUsername(employee.getUser().getUsername());
 		request.getOccupation().setId(occupation.getId());
+		request.getOccupation().setCode(occupation.getCode());
 		publishDto.add(request);
 		return publishDto;
 	}
@@ -470,7 +510,12 @@ public class EmployeeImplService extends CommonService {
 			user.setUsername(p_dto.getEmail());
 			user.setEmail(p_dto.getEmail());
 			user.setFullname(p_dto.getFullname());
-			user.setPassword(this.passwordEncoder.encode(p_dto.getPassword()));
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(new Date());
+			cal.add(Calendar.MONTH, 1);
+			user.setActivateExpired(cal.getTime());
+			user.setActivateCode(new RandomString(6, new SecureRandom(), RandomString.digits).nextString());
+			user.setPassword("N/A");
 	        for(RoleDto roleDto: p_dto.getRoles()) {
 	        	RoleEntity role = this.roleRepo.findByAuthority(roleDto.getAuthority());
 				user.getRoles().add(role);

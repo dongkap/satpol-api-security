@@ -21,6 +21,9 @@ public interface UserRepo extends JpaRepository<UserEntity, String>, JpaSpecific
 	@Query("SELECT u FROM UserEntity u WHERE u.id = :id AND u.verificationCode = :verificationCode")
 	UserEntity loadByIdAndVerificationCode(@Param("id") String id, @Param("verificationCode") String verificationCode);
 
+	@Query("SELECT u FROM UserEntity u WHERE u.id = :id AND u.activateCode = :activateCode")
+	UserEntity loadByIdAndActivateCode(@Param("id") String id, @Param("activateCode") String activateCode);
+
 	@Query("SELECT u FROM UserEntity u WHERE u.id = :id AND u.email = :email")
 	UserEntity loadByIdAndEmail(@Param("id") String id, @Param("email") String email);
 
