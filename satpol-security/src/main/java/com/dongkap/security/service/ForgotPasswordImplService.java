@@ -155,7 +155,7 @@ public class ForgotPasswordImplService {
 				mail.setLocale(p_locale);
 				List<Object> publishDto = new ArrayList<Object>();
 				publishDto.add(mail);
-				CommonStreamMessageDto message = new CommonStreamMessageDto(StreamKeyStatic.FORGOT_PASSWORD, ParameterStatic.NOTIFICATION, publishDto);
+				CommonStreamMessageDto message = new CommonStreamMessageDto(StreamKeyStatic.FORGOT_PASSWORD, p_locale, ParameterStatic.NOTIFICATION, publishDto);
 				ObjectRecord<String, CommonStreamMessageDto> record = StreamRecords.newRecord()
 						.in(StreamKeyStatic.FORGOT_PASSWORD)
                         .ofObject(message);
@@ -198,7 +198,7 @@ public class ForgotPasswordImplService {
 				mail.setLocale(p_locale);
 				List<Object> publishDto = new ArrayList<Object>();
 				publishDto.add(mail);
-				CommonStreamMessageDto message = new CommonStreamMessageDto(StreamKeyStatic.FORGOT_PASSWORD, ParameterStatic.NOTIFICATION, publishDto);
+				CommonStreamMessageDto message = new CommonStreamMessageDto(StreamKeyStatic.FORGOT_PASSWORD, p_locale, ParameterStatic.NOTIFICATION, publishDto);
 				ObjectRecord<String, CommonStreamMessageDto> record = StreamRecords.newRecord()
 						.in(StreamKeyStatic.FORGOT_PASSWORD)
                         .ofObject(message);
