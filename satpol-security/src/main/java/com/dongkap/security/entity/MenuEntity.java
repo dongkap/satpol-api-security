@@ -94,7 +94,7 @@ public class MenuEntity extends BaseAuditEntity {
 	@OrderBy("orderingStr ASC")
 	private Set<MenuEntity> childsMenu = new HashSet<MenuEntity>();
 	
-	@OneToMany(mappedBy = "menu", targetEntity = MenuI18nEntity.class, fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.REMOVE })
+	@OneToMany(mappedBy = "menu", targetEntity = MenuI18nEntity.class, fetch = FetchType.LAZY, cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE })
 	@Fetch(FetchMode.SELECT)
 	private Set<MenuI18nEntity> menuI18n = new HashSet<MenuI18nEntity>();
 	
