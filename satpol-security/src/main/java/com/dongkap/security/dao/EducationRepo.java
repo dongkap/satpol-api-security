@@ -13,4 +13,6 @@ public interface EducationRepo extends JpaRepository<EducationEntity, String>, J
 
 	List<EducationEntity> findByIdIn(List<String> educationIds);
 
+	List<EducationEntity> findByIdInAndEmployee_User_Username(List<String> educationIds, String username);
+
 }

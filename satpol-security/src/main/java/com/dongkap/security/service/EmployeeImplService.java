@@ -273,6 +273,51 @@ public class EmployeeImplService extends CommonService {
 	}
 
 	@Transactional
+	public EmployeeStatusDto getEmployeeStatusProfile(String username) throws Exception {
+		EmployeeEntity employee = employeeRepo.findByUser_Username(username);
+		if(employee != null) {
+			final EmployeeStatusDto response = new EmployeeStatusDto();
+			response.setId(employee.getId());
+			response.setIdEmployee(employee.getIdEmployee());
+			response.setFullname(employee.getUser().getFullname());
+			response.setEmail(employee.getUser().getEmail());
+			response.setUsername(employee.getUser().getUsername());
+			response.setDisabled(!employee.getUser().isEnabled());
+			response.setLocked(!employee.getUser().isAccountNonLocked());
+			response.setAccountExpired(!employee.getUser().isAccountNonExpired());;
+			response.setActive(employee.getActive());
+			response.setVersion(employee.getVersion());
+			response.setCreatedDate(employee.getCreatedDate());
+			response.setCreatedBy(employee.getCreatedBy());
+			response.setModifiedDate(employee.getModifiedDate());;
+			CorporateDto corporate = new CorporateDto();
+			corporate.setId(employee.getCorporate().getId());
+			corporate.setCorporateCode(employee.getCorporate().getCorporateCode());
+			corporate.setCorporateName(employee.getCorporate().getCorporateName());
+			response.setCorporate(corporate);
+			OccupationDto occupation = new OccupationDto();
+			occupation.setId(employee.getOccupation().getId());
+			occupation.setCode(employee.getOccupation().getCode());
+			occupation.setName(employee.getOccupation().getName());
+			response.setOccupation(occupation);
+			employee.getUser().getRoles().forEach(roleEntity->{
+				RoleDto role = new RoleDto();
+				role.setId(roleEntity.getId());
+				role.setAuthority(roleEntity.getAuthority());
+				role.setDescription(roleEntity.getDescription());
+				response.getRoles().add(role);
+			});
+			if(employee.getParentEmployee() != null) {
+				response.setParentId(employee.getParentEmployee().getId());
+				response.setParentLabel(employee.getParentEmployee().getIdEmployee() + " - " + employee.getParentEmployee().getUser().getFullname());
+				response.setParentValue(employee.getParentEmployee().getId());
+			};
+			return response;
+		} else
+			throw new SystemErrorException(ErrorCode.ERR_SCR0010);
+	}
+
+	@Transactional
 	public SelectResponseDto getSelect(Map<String, Object> additionalInfo, FilterDto filter) throws Exception {
 		if(additionalInfo.get("corporate_code") == null) {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);

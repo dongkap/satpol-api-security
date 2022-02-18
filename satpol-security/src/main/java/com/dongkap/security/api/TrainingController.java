@@ -27,7 +27,6 @@ import com.dongkap.dto.security.TrainingDto;
 import com.dongkap.security.service.TrainingImplService;
 
 @RestController
-@RequestMapping(ResourceCode.SECURITY_PATH)
 public class TrainingController extends BaseControllerException {
 
 	@Autowired
@@ -36,14 +35,14 @@ public class TrainingController extends BaseControllerException {
 	@Autowired
 	private TokenStore tokenStore;
 
-	@RequestMapping(value = "/vw/auth/datatable/training-employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/vw/auth/datatable/training-employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CommonResponseDto<TrainingDto>> getDatatableTrainingEmployee(Authentication authentication,
 			@RequestBody(required = true) FilterDto filter) throws Exception {
 		return new ResponseEntity<CommonResponseDto<TrainingDto>>(this.trainingService.getDatatableTrainingEmployee(filter), HttpStatus.OK);
 	}
 
 	@ResponseSuccess(SuccessCode.OK_DEFAULT)
-	@RequestMapping(value = "/trx/auth/post/training/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/trx/auth/post/training/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ApiBaseResponse> postTrainingEmployee(Authentication authentication,
 			@RequestBody(required = true) EmployeeRequestAddDto data) throws Exception {
 		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
@@ -52,10 +51,35 @@ public class TrainingController extends BaseControllerException {
 	}
 
 	@ResponseSuccess(SuccessCode.OK_DELETED)
-	@RequestMapping(value = "/trx/auth/delete/training/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/trx/auth/delete/training/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ApiBaseResponse> deleteTrainings(Authentication authentication,
 													  @RequestBody(required = true) List<String> datas) throws Exception {
 		this.trainingService.deleteTrainings(datas);
+		return new ResponseEntity<ApiBaseResponse>(new ApiBaseResponse(), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = ResourceCode.PROFILE_PATH + "/vw/post/datatable/training-employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<CommonResponseDto<TrainingDto>> getDatatableTrainingEmployeeProfile(Authentication authentication,
+			@RequestBody(required = true) FilterDto filter) throws Exception {
+		String username = authentication.getName();
+		return new ResponseEntity<CommonResponseDto<TrainingDto>>(this.trainingService.getDatatableTrainingEmployee(username, filter), HttpStatus.OK);
+	}
+
+	@ResponseSuccess(SuccessCode.OK_DEFAULT)
+	@RequestMapping(value = ResourceCode.PROFILE_PATH + "/trx/post/training/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ApiBaseResponse> postTrainingEmployeeProfile(Authentication authentication,
+			@RequestBody(required = true) EmployeeRequestAddDto data) throws Exception {
+		String username = authentication.getName();
+		this.trainingService.postTrainingEmployee(username, data);
+		return new ResponseEntity<ApiBaseResponse>(new ApiBaseResponse(), HttpStatus.OK);
+	}
+
+	@ResponseSuccess(SuccessCode.OK_DELETED)
+	@RequestMapping(value = ResourceCode.PROFILE_PATH + "/trx/delete/training/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ApiBaseResponse> deleteTrainingsProfile(Authentication authentication,
+													  @RequestBody(required = true) List<String> datas) throws Exception {
+		String username = authentication.getName();
+		this.trainingService.deleteTrainings(datas, username);
 		return new ResponseEntity<ApiBaseResponse>(new ApiBaseResponse(), HttpStatus.OK);
 	}
 

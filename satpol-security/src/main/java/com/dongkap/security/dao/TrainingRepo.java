@@ -12,5 +12,7 @@ public interface TrainingRepo extends JpaRepository<TrainingEntity, String>, Jpa
 	List<TrainingEntity> findByEmployee_Id(String employeeId);
 
 	List<TrainingEntity> findByIdIn(List<String> trainingIds);
+
+	List<TrainingEntity> findByIdInAndEmployee_User_Username(List<String> trainingIds, String username);
 	
 }

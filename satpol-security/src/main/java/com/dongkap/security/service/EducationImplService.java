@@ -79,6 +79,44 @@ public class EducationImplService extends CommonService {
 	}
 
 	@Transactional
+	public CommonResponseDto<EducationDto> getDatatableEducationEmployee(String username, FilterDto filter, String p_locale) throws Exception {
+		if(p_locale == null) {
+			p_locale = this.locale;
+		}
+		filter.getKeyword().put("username", username);
+		Page<EducationEntity> educations = educationRepo.findAll(EducationSpecification.getDatatableEduactionEmployeeProfile(filter.getKeyword()), page(filter.getOrder(), filter.getOffset(), filter.getLimit()));
+		final CommonResponseDto<EducationDto> response = new CommonResponseDto<EducationDto>();
+		response.setTotalFiltered(Long.valueOf(educations.getContent().size()));
+		response.setTotalRecord(educationRepo.count(EducationSpecification.getDatatable(filter.getKeyword())));
+		final String locale = p_locale;
+		educations.forEach(value -> {
+			EducationDto temp = new EducationDto();
+			temp.setId(value.getId());
+			temp.setSchoolName(value.getSchoolName());
+			temp.setDegree(value.getDegree());
+			temp.setGrade(value.getGrade());
+			temp.setStudy(value.getStudy());
+			temp.setStartYear(value.getStartYear());
+			temp.setEndYear(value.getEndYear());
+			temp.setActive(value.getActive());
+			temp.setVersion(value.getVersion());
+			temp.setCreatedDate(value.getCreatedDate());
+			temp.setCreatedBy(value.getCreatedBy());
+			temp.setModifiedDate(value.getModifiedDate());
+			temp.setModifiedBy(value.getModifiedBy());
+			if(value.getLevel() != null) {
+				ParameterI18nEntity parameter = value.getLevel().getParameterI18n().stream().filter(paramI8n->paramI8n.getLocaleCode().equalsIgnoreCase(locale)).findFirst().orElse(null);
+				if(parameter != null) {
+					temp.setEducationalLevelCode(value.getLevel().getParameterCode());
+					temp.setEducationalLevel(parameter.getParameterValue());
+				}
+			}
+			response.getData().add(temp);
+		});
+		return response;
+	}
+
+	@Transactional
 	public void postEducationEmployee(Map<String, Object> additionalInfo, EmployeeRequestAddDto request) throws Exception {
 		if(additionalInfo.get("corporate_code") == null) {
 			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
@@ -105,8 +143,42 @@ public class EducationImplService extends CommonService {
 		this.educationRepo.saveAndFlush(education);
 	}
 
+	@Transactional
+	public void postEducationEmployee(String username, EmployeeRequestAddDto request) throws Exception {
+		EmployeeEntity employee = this.employeeRepo.findByUser_Username(username);
+		if(employee == null) {
+			throw new SystemErrorException(ErrorCode.ERR_SYS0001);
+		}
+
+		EducationEntity education = new EducationEntity();
+		if(request.getEducation().getId() != null) {
+			education = this.educationRepo.findById(request.getEducation().getId()).orElse(new EducationEntity());	
+		}
+		education.setId(request.getEducation().getId());
+		education.setEducationalLevel(request.getEducation().getEducationalLevel());
+		education.setDegree(request.getEducation().getDegree());
+		education.setGrade(request.getEducation().getGrade());
+		education.setStudy(request.getEducation().getStudy());
+		education.setSchoolName(request.getEducation().getSchoolName());
+		education.setStartYear(request.getEducation().getStartYear());
+		education.setEndYear(request.getEducation().getEndYear());
+		education.setEmployee(employee);
+		this.educationRepo.saveAndFlush(education);
+	}
+
 	public void deleteEducations(List<String> educationIds) throws Exception {
 		List<EducationEntity> educations = this.educationRepo.findByIdIn(educationIds);
+		try {
+			this.educationRepo.deleteInBatch(educations);
+		} catch (DataIntegrityViolationException e) {
+			throw new SystemErrorException(ErrorCode.ERR_SCR0009);
+		} catch (ConstraintViolationException e) {
+			throw new SystemErrorException(ErrorCode.ERR_SCR0009);
+		}
+	}
+
+	public void deleteEducations(List<String> educationIds, String username) throws Exception {
+		List<EducationEntity> educations = this.educationRepo.findByIdInAndEmployee_User_Username(educationIds, username);
 		try {
 			this.educationRepo.deleteInBatch(educations);
 		} catch (DataIntegrityViolationException e) {

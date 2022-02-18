@@ -31,7 +31,6 @@ import com.dongkap.dto.select.SelectResponseDto;
 import com.dongkap.security.service.EmployeeImplService;
 
 @RestController
-@RequestMapping(ResourceCode.SECURITY_PATH)
 public class EmployeeController extends BaseControllerException {
 	
 	@Autowired
@@ -40,14 +39,14 @@ public class EmployeeController extends BaseControllerException {
 	@Autowired
 	private TokenStore tokenStore;
 
-	@RequestMapping(value = "/vw/auth/datatable/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/vw/auth/datatable/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<CommonResponseDto<EmployeeListDto>> getDatatableEmployee(Authentication authentication,
 			@RequestBody(required = true) FilterDto filter) throws Exception {
 		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
 		return new ResponseEntity<CommonResponseDto<EmployeeListDto>>(this.employeeService.getDatatable(additionalInfo, filter), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/vw/auth/personal-info/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/vw/auth/personal-info/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<EmployeePersonalInfoDto> getEmployeePersonalInfo(Authentication authentication,
 														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 														 @RequestBody(required = true) Map<String, Object> data) throws Exception {
@@ -55,7 +54,7 @@ public class EmployeeController extends BaseControllerException {
 		return new ResponseEntity<EmployeePersonalInfoDto>(this.employeeService.getEmployeePersonalInfo(additionalInfo, data, locale), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/vw/auth/status/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/vw/auth/status/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<EmployeeStatusDto> getEmployeeStatus(Authentication authentication,
 														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 														 @RequestBody(required = true) Map<String, Object> data) throws Exception {
@@ -63,7 +62,7 @@ public class EmployeeController extends BaseControllerException {
 		return new ResponseEntity<EmployeeStatusDto>(this.employeeService.getEmployeeStatus(additionalInfo, data), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/vw/auth/select/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/vw/auth/select/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<SelectResponseDto> getSelect(Authentication authentication,
 														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 														 @RequestBody(required = true) FilterDto filter) throws Exception {
@@ -71,7 +70,7 @@ public class EmployeeController extends BaseControllerException {
 		return new ResponseEntity<SelectResponseDto>(this.employeeService.getSelect(additionalInfo, filter), HttpStatus.OK);
 	}
 
-	@RequestMapping(value = "/vw/auth/select/employee-parent/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/vw/auth/select/employee-parent/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<SelectResponseDto> getSelectEmployeeParent(Authentication authentication,
 														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 														 @RequestBody(required = true) FilterDto filter) throws Exception {
@@ -80,7 +79,7 @@ public class EmployeeController extends BaseControllerException {
 	}
 
 	@ResponseSuccess(SuccessCode.OK_DEFAULT)
-	@RequestMapping(value = "/trx/auth/add/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/trx/auth/add/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ApiBaseResponse> postEmployee(Authentication authentication,
 			 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale,
 			@RequestBody(required = true) EmployeeRequestAddDto data) throws Exception {
@@ -90,7 +89,7 @@ public class EmployeeController extends BaseControllerException {
 	}
 
 	@ResponseSuccess(SuccessCode.OK_DEFAULT)
-	@RequestMapping(value = "/trx/auth/put/personal-info/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/trx/auth/put/personal-info/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ApiBaseResponse> putEmployeePersonalInfo(Authentication authentication,
 			@RequestBody(required = true) EmployeePersonalInfoDto data) throws Exception {
 		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
@@ -99,12 +98,19 @@ public class EmployeeController extends BaseControllerException {
 	}
 
 	@ResponseSuccess(SuccessCode.OK_DEFAULT)
-	@RequestMapping(value = "/trx/auth/put/status/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = ResourceCode.SECURITY_PATH + "/trx/auth/put/status/employee/v.1", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ApiBaseResponse> putEmployeeStatus(Authentication authentication,
 			@RequestBody(required = true) EmployeeStatusDto data) throws Exception {
 		Map<String, Object> additionalInfo = this.getAdditionalInformation(authentication);
 		this.employeeService.putEmployeeStatus(additionalInfo, data);
 		return new ResponseEntity<ApiBaseResponse>(new ApiBaseResponse(), HttpStatus.OK);
+	}
+
+	@RequestMapping(value = ResourceCode.PROFILE_PATH + "/vw/get/status/employee/v.1", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<EmployeeStatusDto> getEmployeeStatusProfile(Authentication authentication,
+														 @RequestHeader(name = HttpHeaders.ACCEPT_LANGUAGE, required = false) String locale) throws Exception {
+		String username = authentication.getName();
+		return new ResponseEntity<EmployeeStatusDto>(this.employeeService.getEmployeeStatusProfile(username), HttpStatus.OK);
 	}
 
 	public Map<String, Object> getAdditionalInformation(Authentication auth) {
