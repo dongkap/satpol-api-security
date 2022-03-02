@@ -65,7 +65,7 @@
         <xalan.version>2.7.1</xalan.version>
         <svnkit.version>1.9.0</svnkit.version>
         <logstash-encoder.version>4.6</logstash-encoder.version>
-        <swagger.version>2.7.0</swagger.version>
+        <swagger.version>2.9.2</swagger.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <javax.servlet-api.version>3.1.0</javax.servlet-api.version>
         <failOnMissingWebXml>false</failOnMissingWebXml>
